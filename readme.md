@@ -53,7 +53,7 @@ A single-file, self-contained portfolio built for performance and personality. N
 No build step needed. Just open the file:
 
 ```bash
-git clone https://github.com/Qasim-Akram/portfolio
+git clone https://github.com/Muhammad-Qasim-Akram/portfolio
 cd portfolio
 open index.html
 ```
@@ -74,7 +74,7 @@ portfolio/
 ## Contact
 
 - **Email:** qasimakram46@hotmail.com
-- **GitHub:** [github.com/Qasim-Akram](https://github.com/Qasim-Akram)
+- **GitHub:** [github.com/Qasim-Akram](https://github.com/Muhammad-Qasim-Akram)
 - **LinkedIn:** [linkedin.com/in/qasimakram](https://linkedin.com/in/qasimakram)
 
 ---
