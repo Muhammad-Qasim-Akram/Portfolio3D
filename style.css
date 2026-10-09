@@ -42,34 +42,36 @@ body {
 
 #cur {
   position: fixed;
-  width: 34px;
-  height: 34px;
+  width: 46px;
+  height: 46px;
   pointer-events: none;
   z-index: 99999;
   top: 0;
   left: 0;
   transform: translate3d(-200px, -200px, 0);
   opacity: 1;
-  transition: opacity 120ms ease;
+  transition: opacity 80ms ease;
 }
 #cur::before {
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 8px;
-  height: 8px;
+  width: 11px;
+  height: 11px;
   border-radius: 50%;
   background: var(--black);
+  box-shadow: 0 1px 5px rgba(17, 17, 17, 0.42);
   content: "";
   transform: translate(-50%, -50%) scale(1);
   transition: transform 150ms var(--ease-out);
 }
 #cur::after {
   position: absolute;
-  inset: 2px;
-  border: 1px solid rgba(17, 17, 17, 0.72);
+  inset: 1px;
+  border: 1.5px solid rgba(17, 17, 17, 0.86);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
+  background: transparent;
+  box-shadow: 0 1px 5px rgba(17, 17, 17, 0.18);
   content: "";
   pointer-events: none;
   opacity: 0;
@@ -78,12 +80,26 @@ body {
     opacity 120ms ease,
     transform 180ms var(--ease-out);
 }
+#cur.native {
+  opacity: 0;
+}
 #cur.big::before {
   transform: translate(-50%, -50%) scale(0.65);
 }
 #cur.big::after {
   opacity: 1;
-  transform: scale(1);
+  transform: scale(0.86);
+  border-color: var(--red);
+}
+a,
+button,
+[role="button"],
+select {
+  cursor: pointer;
+}
+input,
+textarea {
+  cursor: text;
 }
 body:not(:hover) #cur {
   opacity: 0;
@@ -346,9 +362,6 @@ nav.blur {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
-  transform: scale(var(--hero-scroll-scale, 1));
-  transform-origin: center center;
-  opacity: var(--hero-scroll-opacity, 1);
 }
 .hero-bg-word {
   position: absolute;
@@ -490,7 +503,7 @@ nav.blur {
   position: relative;
   transform-style: preserve-3d;
   will-change: transform;
-  transition: transform 0.05s linear;
+  transition: transform 90ms linear;
 }
 .flip-front,
 .flip-back {
@@ -2196,6 +2209,9 @@ html {
 .ambient-backdrop.is-visible:not(.is-paused) .ambient-blob {
   animation-play-state: running;
 }
+.ambient-backdrop.is-scrolling .ambient-blob {
+  animation-play-state: paused !important;
+}
 .ambient-blob-one {
   top: -14%;
   left: -10%;
@@ -2535,9 +2551,9 @@ body.qpass2-ready .scroll-hint {
 .sr-l,
 .sr-r {
   opacity: 0;
-  transform: translateY(32px);
+  transform: translateY(48px);
   transition:
-    opacity var(--duration-reveal) var(--ease-out),
+    opacity 460ms var(--ease-out),
     transform var(--duration-reveal) var(--ease-reveal-spring);
 }
 .sr.in,
@@ -3180,13 +3196,13 @@ footer.glass .back-top:hover {
   .sr,
   .sr-l,
   .sr-r {
-    transition-duration: 440ms;
+    transition-duration: 480ms;
     transition-delay: 0ms;
   }
   .sr,
   .sr-l,
   .sr-r {
-    transform: translateY(24px);
+    transform: translateY(36px);
   }
 }
 
@@ -3528,5 +3544,25 @@ footer.glass .back-top:hover {
 @media (max-width: 640px) and (prefers-reduced-motion: reduce) {
   .ambient-blob-one {
     animation: none;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a,
+  button,
+  [role="button"],
+  [role="link"],
+  [role="menuitem"],
+  select,
+  summary,
+  .btn-primary,
+  .btn-outline,
+  .btn-nav,
+  .btn-send {
+    cursor: pointer;
+  }
+  input,
+  textarea {
+    cursor: text;
   }
 }

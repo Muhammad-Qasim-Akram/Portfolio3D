@@ -34,25 +34,28 @@ if (document.readyState === "complete") {
 }
 
 const cur = document.getElementById("cur");
+const nativeCursorTargets =
+  "a,button,[role='button'],[role='link'],[role='menuitem'],select,summary,input,textarea";
+const highlightedCursorTargets = ".proj-card,.svc-row,.sk,.stat,.c-link";
 document.addEventListener("pointerover", (event) => {
-  if (
-    event.target instanceof Element &&
-    event.target.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
-  ) {
+  if (!(event.target instanceof Element)) return;
+  if (event.target.closest(nativeCursorTargets)) {
+    cur.classList.add("native");
+    cur.classList.remove("big");
+  } else if (event.target.closest(highlightedCursorTargets)) {
     cur.classList.add("big");
   }
 });
 document.addEventListener("pointerout", (event) => {
-  if (
-    event.target instanceof Element &&
-    event.target.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link") &&
-    !(
-      event.relatedTarget instanceof Element &&
-      event.relatedTarget.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
-    )
-  ) {
-    cur.classList.remove("big");
-  }
+  if (!(event.target instanceof Element)) return;
+  const previousTarget = event.target.closest(`${nativeCursorTargets},${highlightedCursorTargets}`);
+  if (!previousTarget) return;
+  const nextTarget =
+    event.relatedTarget instanceof Element
+      ? event.relatedTarget.closest(`${nativeCursorTargets},${highlightedCursorTargets}`)
+      : null;
+  if (previousTarget === nextTarget) return;
+  cur.classList.remove("big", "native");
 });
 const scrollTasks = new Set();
 let scrollFrame = 0;
@@ -160,35 +163,106 @@ function updateActiveNavigation() {
   updateNavIndicator();
 }
 
+const heroPhoto = document.querySelector(".hero-photo-wrap");
+const flipCard = document.getElementById("flipCard");
+let heroPhotoCentered = false;
+let flipRotation = 0;
+let pendingFlipFrame = 0;
+
+function updateHeroPhotoPosition() {
+  const bounds = heroPhoto.getBoundingClientRect();
+  const center = window.innerHeight / 2;
+  heroPhotoCentered = bounds.top < center && bounds.bottom > center;
+}
+
+function updateFlipCard() {
+  pendingFlipFrame = 0;
+  flipCard.style.transform = `rotateY(${flipRotation.toFixed(1)}deg)`;
+}
+
+function queueFlipCardUpdate() {
+  if (pendingFlipFrame) return;
+  pendingFlipFrame = window.requestAnimationFrame(updateFlipCard);
+}
+
 scrollTasks.add(updateActiveNavigation);
-const hero = document.getElementById("hero");
-const heroScrollReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-let heroScrollRange = Math.max(hero.offsetHeight, window.innerHeight);
+scrollTasks.add(updateHeroPhotoPosition);
+updateHeroPhotoPosition();
 
-function refreshHeroScrollRange() {
-  heroScrollRange = Math.max(hero.offsetHeight, window.innerHeight);
-}
+const reduceHeroMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+window.addEventListener(
+  "wheel",
+  (event) => {
+    if (
+      reduceHeroMotion.matches ||
+      !heroPhotoCentered ||
+      event.deltaY === 0
+    ) return;
+    const direction = Math.sign(event.deltaY);
+    if ((direction > 0 && flipRotation >= 180) || (direction < 0 && flipRotation <= 0)) return;
 
-function updateHeroScrollZoom() {
-  if (heroScrollReducedMotion.matches) return;
-  const progress = Math.max(0, Math.min(1, window.scrollY / heroScrollRange));
-  hero.style.setProperty("--hero-scroll-scale", (1 - progress * 0.085).toFixed(3));
-  hero.style.setProperty("--hero-scroll-opacity", (1 - progress * 0.3).toFixed(3));
-}
+    event.preventDefault();
+    const deltaScale =
+      event.deltaMode === WheelEvent.DOM_DELTA_LINE
+        ? 16
+        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
+          ? window.innerHeight
+          : 1;
+    const delta = Math.abs(event.deltaY) * deltaScale;
+    flipRotation = Math.max(
+      0,
+      Math.min(180, flipRotation + direction * Math.min(36, delta * 0.12)),
+    );
+    queueFlipCardUpdate();
+  },
+  { passive: false },
+);
 
-scrollTasks.add(updateHeroScrollZoom);
-refreshHeroScrollRange();
-updateHeroScrollZoom();
+let previousTouchY = 0;
+document.addEventListener(
+  "touchstart",
+  (event) => {
+    previousTouchY = event.touches[0].clientY;
+  },
+  { passive: true },
+);
+document.addEventListener(
+  "touchmove",
+  (event) => {
+    if (reduceHeroMotion.matches || !heroPhotoCentered) return;
+    const currentTouchY = event.touches[0].clientY;
+    const delta = previousTouchY - currentTouchY;
+    const direction = Math.sign(delta);
+    if (
+      delta === 0 ||
+      (direction > 0 && flipRotation >= 180) ||
+      (direction < 0 && flipRotation <= 0)
+    ) {
+      previousTouchY = currentTouchY;
+      return;
+    }
+
+    event.preventDefault();
+    flipRotation = Math.max(
+      0,
+      Math.min(180, flipRotation + direction * Math.min(30, Math.abs(delta) * 0.5)),
+    );
+    previousTouchY = currentTouchY;
+    queueFlipCardUpdate();
+  },
+  { passive: false },
+);
+
 refreshNavSectionPositions();
 window.addEventListener("load", () => {
-  refreshHeroScrollRange();
+  updateHeroPhotoPosition();
   refreshNavSectionPositions();
   activeNavHref = "";
   activeSectionId = "";
   scheduleScrollWork();
 }, { once: true });
 window.addEventListener("resize", () => {
-  refreshHeroScrollRange();
+  updateHeroPhotoPosition();
   refreshNavSectionPositions();
   activeNavHref = "";
   activeSectionId = "";
@@ -204,76 +278,6 @@ const io = new IntersectionObserver(
 );
 document.querySelectorAll(".sr,.sr-l,.sr-r").forEach((el) => io.observe(el));
 
-
-const flipCard = document.getElementById("flipCard");
-const heroWrap = document.querySelector(".hero-photo-wrap");
-
-let rotation = 0;
-let touchStartY = 0;
-
-function setFlip(deg) {
-  rotation = Math.min(180, Math.max(0, deg));
-  flipCard.style.transform = `rotateY(${rotation}deg)`;
-}
-
-function isHeroCentered() {
-  const rect = heroWrap.getBoundingClientRect();
-  return (
-    rect.top < window.innerHeight / 2 && rect.bottom > window.innerHeight / 2
-  );
-}
-
-// ── DESKTOP: wheel ──
-window.addEventListener(
-  "wheel",
-  (e) => {
-    if (!isHeroCentered()) return;
-
-    if (e.deltaY > 0 && rotation < 180) {
-      setFlip(rotation + 12);
-      return;
-    }
-
-    if (e.deltaY < 0 && rotation > 0) {
-      setFlip(rotation - 12);
-    }
-  },
-  { passive: true },
-);
-
-// MOBILE
-document.addEventListener(
-  "touchstart",
-  (e) => {
-    touchStartY = e.touches[0].clientY;
-  },
-  { passive: true },
-);
-
-document.addEventListener(
-  "touchmove",
-  (e) => {
-    if (!isHeroCentered()) return;
-
-    const deltaY = touchStartY - e.touches[0].clientY;
-
-    if (deltaY > 3 && rotation < 180) {
-      setFlip(rotation + 3);
-      touchStartY = e.touches[0].clientY;
-      return;
-    }
-
-    if (deltaY < -3 && rotation > 0) {
-      setFlip(rotation - 3);
-      touchStartY = e.touches[0].clientY;
-    }
-  },
-  { passive: true },
-);
-
-document.addEventListener("touchend", () => {
-  touchStartY = 0;
-});
 
 emailjs.init("yCgwIWXoWe_klsqNy");
 
@@ -867,6 +871,22 @@ const BOT_DATA = {
   document.addEventListener("visibilitychange", updateBackdropState, {
     passive: true,
   });
+
+  let ambientResumeTimer = 0;
+  if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    window.addEventListener(
+      "scroll",
+      () => {
+        backdrop.classList.add("is-scrolling");
+        window.clearTimeout(ambientResumeTimer);
+        ambientResumeTimer = window.setTimeout(() => {
+          ambientResumeTimer = 0;
+          backdrop.classList.remove("is-scrolling");
+        }, 180);
+      },
+      { passive: true },
+    );
+  }
 
   if (canUsePointerGlow) {
     document.addEventListener(
