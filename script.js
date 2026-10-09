@@ -464,3 +464,340 @@ function scrambleEl(el, duration) {
     }
   });
 })();
+
+// ===== Chatbot script start =====
+const BOT_DATA = {
+  name: "Muhammad Qasim Akram",
+  role: "Full Stack Developer & AI Engineer",
+  intro: "Hey, I'm Qasim — a full stack developer and AI engineer from Pakistan. I build useful products across React frontends, Django and Node.js backends, and AI systems. I like taking ideas from the first line of code all the way to a live deployment.",
+  stack: {
+    frontend: ["React.js", "JavaScript", "TypeScript", "HTML", "CSS"],
+    backend: ["Python", "Django", "Node.js", "REST APIs", "WebSockets", "PostgreSQL", "MongoDB", "Redis"],
+    ai: ["YOLOv8", "OpenCV", "Computer Vision", "LLM APIs", "LLaMA 3"],
+    tools: ["Git & GitHub", "Azure", "Vercel", "Netlify", "GitHub Actions", "Railway"]
+  },
+  projects: [
+    {
+      name: "ChatRoom — Real-Time Chat App",
+      description: "A real-time room-based chat app built with Django Channels, WebSockets, and Redis.",
+      link: "https://chat-room-two-pi.vercel.app/"
+    },
+    {
+      name: "DevChat — AI Chat Assistant",
+      description: "An LLM-powered developer assistant with context memory and streaming, using LLaMA 3 via Ollama.",
+      link: "https://dev-chat-gilt.vercel.app/"
+    },
+    {
+      name: "EyeSpy — Blind Assistance System",
+      description: "Real-time object detection and audio feedback using YOLOv8 on a live camera.",
+      link: "https://github.com/Muhammad-Qasim-Akram/EyeSpy"
+    },
+    {
+      name: "YOUROWN — E-Commerce Platform",
+      description: "A storefront with a cart, JWT authentication, order tracking, Azure hosting, and GitHub Actions CI/CD.",
+      link: "https://qasim-ecommerce.azurewebsites.net/"
+    },
+    {
+      name: "Minimal Analysis — AI Stock Predictor",
+      description: "Stock analysis with live market data and AI-generated insights.",
+      link: "https://github.com/Muhammad-Qasim-Akram/Stock-Price-Prediction"
+    }
+  ],
+  education: "TODO: Add your education details.",
+  certs: ["TODO: Add certifications, or replace this with an empty array if you have none."],
+  contact: {
+    email: "qasimakram46@hotmail.com",
+    github: "https://github.com/Muhammad-Qasim-Akram",
+    linkedin: "https://linkedin.com/in/qasimakram"
+  },
+  resumeUrl: "img/Muhammad_Qasim_Akram_Resume.pdf",
+  availability: "Open to collaborations, freelance work, and interesting opportunities."
+};
+
+(() => {
+  const panel = document.getElementById("qbot-panel");
+  const launcher = document.getElementById("qbot-launcher");
+  const closeButton = document.getElementById("qbot-close");
+  const messages = document.getElementById("qbot-messages");
+  const chips = document.getElementById("qbot-chips");
+  const suggestions = document.getElementById("qbot-suggestions");
+  const form = document.getElementById("qbot-form");
+  const input = document.getElementById("qbot-input");
+  const displayName = BOT_DATA.name.trim().split(/\s+/).slice(-2).join(" ");
+  document.getElementById("qbot-title").textContent = `${displayName}'s assistant`;
+  const commandNames = [
+    "/help", "/intro", "/stack", "/projects", "/education",
+    "/certs", "/contact", "/resume", "/hire", "/clear", "/coffee"
+  ];
+  const quickCommands = ["/intro", "/stack", "/projects", "/contact"];
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  let hasOpened = false;
+  let replyId = 0;
+
+  function addMessage(kind, content) {
+    const message = document.createElement("div");
+    message.className = `qbot-message qbot-${kind}`;
+    if (typeof content === "string") {
+      message.textContent = content;
+    } else {
+      content.forEach((part) => {
+        if (part.url) {
+          const link = document.createElement("a");
+          link.className = "qbot-link";
+          link.href = part.url;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = part.text;
+          message.append(link);
+        } else {
+          message.append(document.createTextNode(part.text));
+        }
+      });
+    }
+    messages.append(message);
+    messages.scrollTop = messages.scrollHeight;
+    return message;
+  }
+
+  function setChips(commands) {
+    chips.replaceChildren();
+    commands.forEach((command) => {
+      const chip = document.createElement("button");
+      chip.className = "qbot-chip";
+      chip.type = "button";
+      chip.textContent = command;
+      chip.addEventListener("click", () => runCommand(command));
+      chips.append(chip);
+    });
+  }
+
+  function showSuggestions(value) {
+    const trimmed = value.trim().toLowerCase();
+    if (!trimmed.startsWith("/")) {
+      suggestions.hidden = true;
+      suggestions.replaceChildren();
+      return;
+    }
+    const matches = commandNames.filter((command) => command.startsWith(trimmed));
+    suggestions.replaceChildren();
+    matches.forEach((command) => {
+      const option = document.createElement("button");
+      option.className = "qbot-suggestion";
+      option.type = "button";
+      option.setAttribute("role", "option");
+      option.textContent = command;
+      option.addEventListener("click", () => runCommand(command));
+      suggestions.append(option);
+    });
+    suggestions.hidden = matches.length === 0;
+  }
+
+  function getReply(command) {
+    switch (command) {
+      case "/help":
+        return {
+          text: "Try /intro, /stack, /projects, /education, /certs, /contact, /resume, or /hire. You can also ask me in plain English.",
+          chips: quickCommands
+        };
+      case "/intro":
+        return { text: BOT_DATA.intro, typewriter: true, chips: quickCommands };
+      case "/stack":
+        return {
+          parts: [
+            { text: "Here's what I work with:\nFrontend: " + BOT_DATA.stack.frontend.join(", ") +
+              "\nBackend: " + BOT_DATA.stack.backend.join(", ") +
+              "\nAI: " + BOT_DATA.stack.ai.join(", ") +
+              "\nTools: " + BOT_DATA.stack.tools.join(", ") }
+          ],
+          chips: ["/projects", "/intro", "/contact"]
+        };
+      case "/projects":
+        return {
+          parts: BOT_DATA.projects.flatMap((project, index) => [
+            { text: `${index ? "\n\n" : ""}${project.name}: ${project.description} ` },
+            { text: "View project ↗", url: project.link }
+          ]),
+          chips: ["/stack", "/contact", "/hire"]
+        };
+      case "/education":
+        return { text: BOT_DATA.education, chips: ["/certs", "/contact"] };
+      case "/certs":
+        return {
+          text: BOT_DATA.certs.length ? BOT_DATA.certs.join("\n") : "I haven't listed any certifications yet.",
+          chips: ["/education", "/stack"]
+        };
+      case "/contact":
+        return {
+          parts: [
+            { text: "You can reach me at " },
+            { text: BOT_DATA.contact.email, url: `mailto:${BOT_DATA.contact.email}` },
+            { text: ", or find me on " },
+            { text: "GitHub", url: BOT_DATA.contact.github },
+            { text: " and " },
+            { text: "LinkedIn", url: BOT_DATA.contact.linkedin },
+            { text: "." }
+          ],
+          chips: ["/hire", "/projects", "/resume"]
+        };
+      case "/resume":
+        return {
+          parts: [
+            { text: "Here's my " },
+            { text: "resume ↗", url: BOT_DATA.resumeUrl },
+            { text: ". Feel free to get in touch if you'd like to talk." }
+          ],
+          chips: ["/contact", "/hire"]
+        };
+      case "/hire":
+        return {
+          parts: [
+            { text: `${BOT_DATA.availability} Email me at ` },
+            { text: BOT_DATA.contact.email, url: `mailto:${BOT_DATA.contact.email}` },
+            { text: " and let's talk." }
+          ],
+          chips: ["/projects", "/resume", "/contact"]
+        };
+      case "/coffee":
+        return { text: "Good idea. I’ll bring the code; you bring the coffee. What are we building?", chips: ["/projects", "/hire"] };
+      default:
+        return null;
+    }
+  }
+
+  function runCommand(rawCommand) {
+    const command = rawCommand.trim().toLowerCase()
+      .replace(/\s+/g, " ")
+      .replace(/^\/\s*/, "/");
+    input.value = "";
+    showSuggestions("");
+    if (command === "/clear") {
+      replyId++;
+      messages.replaceChildren();
+      setChips(quickCommands);
+      showBotReply({
+        text: "All cleared. What would you like to know?",
+        chips: quickCommands
+      });
+      return;
+    }
+    const reply = getReply(command);
+    if (!reply) {
+      showBotReply({
+        text: "I’m not sure about that one. Try /help and I’ll point you in the right direction.",
+        chips: quickCommands
+      });
+      return;
+    }
+    showBotReply(reply);
+  }
+
+  function showBotReply(reply) {
+    const currentReply = ++replyId;
+    messages.querySelectorAll(".qbot-typing").forEach((indicator) => indicator.remove());
+    chips.replaceChildren();
+    const typing = document.createElement("div");
+    typing.className = "qbot-message qbot-bot qbot-typing";
+    typing.setAttribute("aria-label", "Assistant is typing");
+    typing.innerHTML = '<span></span><span></span><span></span>';
+    messages.append(typing);
+    messages.scrollTop = messages.scrollHeight;
+    const delay = 600 + Math.floor(Math.random() * 301);
+
+    window.setTimeout(() => {
+      if (currentReply !== replyId) return;
+      typing.remove();
+      const content = reply.parts || reply.text;
+      const message = addMessage("bot", content);
+      if (reply.typewriter && !reduceMotion.matches) {
+        const fullText = reply.text;
+        message.textContent = "";
+        let index = 0;
+        const step = () => {
+          if (currentReply !== replyId) return;
+          message.textContent = fullText.slice(0, index++);
+          messages.scrollTop = messages.scrollHeight;
+          if (index <= fullText.length) window.setTimeout(step, 16);
+          else setChips(reply.chips);
+        };
+        step();
+      } else {
+        setChips(reply.chips);
+      }
+    }, delay);
+  }
+
+  function normalizePlainText(value) {
+    const text = value.toLowerCase();
+    if (/\b(project|work|portfolio)\b/.test(text)) return "/projects";
+    if (/\b(skill|stack|tech|technology|technologies)\b/.test(text)) return "/stack";
+    if (/\b(contact|email|github|linkedin)\b/.test(text)) return "/contact";
+    if (/\b(hire|hiring|job|freelance|available)\b/.test(text)) return "/hire";
+    if (/\b(education|study|degree|university)\b/.test(text)) return "/education";
+    if (/\b(resume|cv)\b/.test(text)) return "/resume";
+    if (/\b(hello|hi|hey)\b/.test(text)) return "/intro";
+    return null;
+  }
+
+  function submitMessage(value) {
+    const text = value.trim();
+    if (!text) return;
+    addMessage("user", text);
+    if (text.startsWith("/")) {
+      runCommand(text);
+      return;
+    }
+    const command = normalizePlainText(text);
+    if (command) {
+      runCommand(command);
+    } else {
+      showBotReply({
+        text: "I’m not sure I have that detail, but I’m happy to help. Try /help to see what I can tell you.",
+        chips: quickCommands
+      });
+    }
+  }
+
+  function openPanel() {
+    panel.hidden = false;
+    panel.setAttribute("aria-hidden", "false");
+    launcher.setAttribute("aria-expanded", "true");
+    launcher.classList.add("qbot-clicked");
+    window.requestAnimationFrame(() => panel.classList.add("qbot-open"));
+    window.setTimeout(() => input.focus(), reduceMotion.matches ? 0 : 180);
+    if (!hasOpened) {
+      hasOpened = true;
+      setChips(quickCommands);
+      showBotReply({
+        text: `Hey! I'm here to tell you about ${displayName}'s work, skills, and how to get in touch.`,
+        chips: quickCommands
+      });
+    }
+  }
+
+  function closePanel() {
+    panel.classList.remove("qbot-open");
+    panel.hidden = true;
+    panel.setAttribute("aria-hidden", "true");
+    launcher.setAttribute("aria-expanded", "false");
+    launcher.focus();
+  }
+
+  launcher.addEventListener("click", () => {
+    if (panel.hidden) openPanel();
+    else closePanel();
+  });
+  closeButton.addEventListener("click", closePanel);
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const value = input.value;
+    input.value = "";
+    showSuggestions("");
+    submitMessage(value);
+  });
+  input.addEventListener("input", () => showSuggestions(input.value));
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && !panel.hidden) closePanel();
+  });
+})();
+
+// ===== Chatbot script end =====

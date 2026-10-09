@@ -509,7 +509,43 @@
       </div>
     </footer>
 
+    <!-- ===== Chatbot start ===== -->
+    <div class="qbot-widget">
+      <section class="qbot-panel" id="qbot-panel" role="dialog" aria-modal="false"
+        aria-labelledby="qbot-title" aria-hidden="true" hidden>
+        <header class="qbot-header">
+          <div class="qbot-heading">
+            <span class="qbot-status" aria-hidden="true"></span>
+            <div>
+              <h2 class="qbot-title" id="qbot-title">Qasim's assistant</h2>
+              <span class="qbot-status-label">Here to help</span>
+            </div>
+          </div>
+          <button class="qbot-close" id="qbot-close" type="button" aria-label="Close chat">×</button>
+        </header>
+        <div class="qbot-messages" id="qbot-messages" role="log" aria-live="polite"
+          aria-relevant="additions text"></div>
+        <div class="qbot-suggestions" id="qbot-suggestions" role="listbox"
+          aria-label="Available commands" hidden></div>
+        <div class="qbot-chips" id="qbot-chips" aria-label="Quick replies"></div>
+        <form class="qbot-form" id="qbot-form">
+          <label class="qbot-sr-only" for="qbot-input">Message Qasim's assistant</label>
+          <input class="qbot-input" id="qbot-input" type="text" autocomplete="off"
+            placeholder="Ask me something..." aria-label="Type a message" />
+          <button class="qbot-send" type="submit" aria-label="Send message">
+            <span aria-hidden="true">↑</span>
+          </button>
+        </form>
+      </section>
+      <button class="qbot-launcher" id="qbot-launcher" type="button" aria-label="Open chat"
+        aria-controls="qbot-panel" aria-expanded="false">
+        <span class="qbot-launcher-icon" aria-hidden="true">↗</span>
+        <span class="qbot-launcher-label">Chat with me</span>
+      </button>
+    </div>
+    <!-- ===== Chatbot end ===== -->
     <script src="script.js"></script>
+
 </body>
 
 </html>

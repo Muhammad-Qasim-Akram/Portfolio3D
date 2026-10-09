@@ -1493,6 +1493,13 @@ footer {
   .stack-grid {
     grid-template-columns: 1fr 1fr;
   }
+  .stack-grid .sk:last-child {
+    grid-column: 1 / -1;
+  }
+  .stack-grid .sk:last-child .sk-tags {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
   .section {
     padding: 56px 18px;
   }
@@ -1655,3 +1662,348 @@ footer {
 #sendBtn.sent {
   color: #c0392b;
 }
+
+/* ===== Chatbot start ===== */
+.qbot-widget {
+  position: fixed;
+  right: 24px;
+  bottom: max(22px, env(safe-area-inset-bottom));
+  z-index: 1100;
+  font-family: "Inter", sans-serif;
+  color: var(--black);
+}
+.qbot-panel {
+  position: absolute;
+  right: 0;
+  bottom: 76px;
+  display: flex;
+  flex-direction: column;
+  width: min(360px, calc(100vw - 32px));
+  height: min(590px, 80vh);
+  max-height: 80vh;
+  overflow: hidden;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  box-shadow: 0 20px 56px rgba(0, 0, 0, 0.22);
+  transform: scale(0.94) translateY(12px);
+  transform-origin: bottom right;
+  opacity: 0;
+  transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.18s ease;
+}
+.qbot-panel.qbot-open {
+  transform: scale(1) translateY(0);
+  opacity: 1;
+}
+.qbot-panel[hidden] {
+  display: none;
+}
+.qbot-header {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 17px;
+  background: var(--black);
+  color: var(--white);
+}
+.qbot-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.qbot-status {
+  width: 8px;
+  height: 8px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.12);
+}
+.qbot-title {
+  font-family: "Syne", sans-serif;
+  font-size: 0.98rem;
+  font-weight: 700;
+}
+.qbot-status-label {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 0.68rem;
+}
+.qbot-close,
+.qbot-send {
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border: 0;
+  cursor: pointer;
+  font-family: "Inter", sans-serif;
+}
+.qbot-close {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  font-size: 1.35rem;
+  line-height: 1;
+  transition: background 0.18s ease;
+}
+.qbot-close:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.qbot-messages {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 100px;
+  padding: 16px 14px 10px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.qbot-message {
+  max-width: 88%;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  animation: qbot-message-in 0.22s ease both;
+}
+.qbot-bot {
+  align-self: flex-start;
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-top-left-radius: 4px;
+  color: var(--black);
+}
+.qbot-user {
+  align-self: flex-end;
+  background: var(--black);
+  border-top-right-radius: 4px;
+  color: var(--white);
+}
+.qbot-link {
+  color: var(--red);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.qbot-user .qbot-link {
+  color: #f2a197;
+}
+.qbot-typing {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 48px;
+  padding: 13px;
+}
+.qbot-typing span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gray);
+  animation: qbot-dot 0.85s ease-in-out infinite;
+}
+.qbot-typing span:nth-child(2) {
+  animation-delay: 0.12s;
+}
+.qbot-typing span:nth-child(3) {
+  animation-delay: 0.24s;
+}
+.qbot-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 90px;
+  margin: 0 13px 8px;
+  overflow-y: auto;
+}
+.qbot-suggestions[hidden] {
+  display: none;
+}
+.qbot-suggestion {
+  padding: 5px 9px;
+  border: 1px solid var(--border);
+  border-radius: 100px;
+  background: var(--white);
+  color: var(--black);
+  font: 500 0.68rem "Inter", sans-serif;
+  cursor: pointer;
+}
+.qbot-suggestion:hover {
+  border-color: var(--red);
+}
+.qbot-chips {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 7px;
+  padding: 7px 13px 11px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.qbot-chips::-webkit-scrollbar {
+  display: none;
+}
+.qbot-chip {
+  flex: 0 0 auto;
+  padding: 6px 10px;
+  border: 1px solid rgba(192, 57, 43, 0.3);
+  border-radius: 100px;
+  background: transparent;
+  color: var(--red);
+  font: 600 0.68rem "Inter", sans-serif;
+  cursor: pointer;
+  animation: qbot-chip-in 0.2s ease both;
+}
+.qbot-chip:hover {
+  background: rgba(192, 57, 43, 0.08);
+}
+.qbot-form {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid var(--border);
+  background: var(--bg2);
+}
+.qbot-input {
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  border-radius: 9px;
+  outline: none;
+  background: var(--white);
+  color: var(--black);
+  font: 400 0.78rem "Inter", sans-serif;
+}
+.qbot-input:focus {
+  border-color: var(--red);
+}
+.qbot-input::placeholder {
+  color: var(--gray);
+}
+.qbot-send {
+  width: 40px;
+  height: 40px;
+  border-radius: 9px;
+  background: var(--black);
+  color: var(--white);
+  font-size: 1.25rem;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+.qbot-send:hover {
+  transform: translateY(-1px);
+  background: var(--red);
+}
+.qbot-close:focus-visible,
+.qbot-send:focus-visible,
+.qbot-launcher:focus-visible,
+.qbot-chip:focus-visible,
+.qbot-suggestion:focus-visible,
+.qbot-input:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 2px;
+}
+.qbot-launcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 52px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--black);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  color: var(--white);
+  font: 700 0.82rem "Inter", sans-serif;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.qbot-launcher:hover {
+  transform: translateY(-2px);
+  background: #222;
+}
+.qbot-launcher::before {
+  position: absolute;
+  z-index: -1;
+  inset: -5px;
+  border: 1px solid rgba(192, 57, 43, 0.48);
+  border-radius: 14px;
+  content: "";
+  animation: qbot-pulse 2s ease-out infinite;
+  pointer-events: none;
+}
+.qbot-launcher.qbot-clicked::before {
+  animation: none;
+  opacity: 0;
+}
+.qbot-launcher-icon {
+  color: #f2a197;
+  font-size: 1rem;
+}
+.qbot-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+@keyframes qbot-message-in {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes qbot-dot {
+  0%, 60%, 100% { opacity: 0.35; transform: translateY(0); }
+  30% { opacity: 1; transform: translateY(-3px); }
+}
+@keyframes qbot-chip-in {
+  from { opacity: 0; transform: translateY(3px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes qbot-pulse {
+  0% { opacity: 0.75; transform: scale(0.96); }
+  75%, 100% { opacity: 0; transform: scale(1.12); }
+}
+@media (max-width: 640px) {
+  .qbot-widget {
+    right: 14px;
+    bottom: max(14px, env(safe-area-inset-bottom));
+  }
+  .qbot-panel {
+    right: 0;
+    bottom: 70px;
+    width: calc(100vw - 28px);
+    height: min(590px, 80vh);
+    border-radius: 16px;
+  }
+  .qbot-launcher {
+    min-height: 48px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qbot-panel,
+  .qbot-message,
+  .qbot-typing span,
+  .qbot-chip,
+  .qbot-launcher,
+  .qbot-launcher::before,
+  .qbot-send {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+/* ===== Chatbot end ===== */
