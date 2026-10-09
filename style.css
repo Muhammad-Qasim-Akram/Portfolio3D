@@ -739,6 +739,9 @@ nav.blur {
   letter-spacing: -0.035em;
   margin-bottom: 32px;
 }
+.about-h .qpass3-heading-mask > span {
+  color: var(--red);
+}
 .about-h em {
   font-style: italic;
   font-weight: 400;
@@ -1967,14 +1970,10 @@ footer {
 }
 .qbot-chips {
   display: flex;
+  flex-wrap: wrap;
   flex: 0 0 auto;
   gap: 7px;
   padding: 7px 13px 11px;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-.qbot-chips::-webkit-scrollbar {
-  display: none;
 }
 .qbot-chip {
   flex: 0 0 auto;

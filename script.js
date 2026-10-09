@@ -496,7 +496,7 @@ const BOT_DATA = {
     "/help", "/intro", "/stack", "/projects", "/education",
     "/certs", "/contact", "/resume", "/hire", "/clear", "/coffee"
   ];
-  const quickCommands = ["/intro", "/stack", "/projects", "/contact"];
+  const quickCommands = ["/intro", "/stack", "/projects", "/education", "/certs", "/contact", "/resume", "/hire"];
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let hasOpened = false;
   let titleScrambled = false;
@@ -923,8 +923,8 @@ const BOT_DATA = {
           const bounds = tiltTarget.getBoundingClientRect();
           const horizontal = (pointerX - bounds.left) / bounds.width - 0.5;
           const vertical = (pointerY - bounds.top) / bounds.height - 0.5;
-          const rotateX = Math.max(-3, Math.min(3, -vertical * 6));
-          const rotateY = Math.max(-3, Math.min(3, horizontal * 6));
+          const rotateX = Math.max(-7, Math.min(7, -vertical * 14));
+          const rotateY = Math.max(-7, Math.min(7, horizontal * 14));
           tiltTarget.style.setProperty("--qpass3-tilt-x", `${rotateY}deg`);
           tiltTarget.style.setProperty("--qpass3-tilt-y", `${rotateX}deg`);
         }
