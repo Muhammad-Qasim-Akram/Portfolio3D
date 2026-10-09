@@ -81,6 +81,9 @@
     <span class="ambient-blob ambient-blob-three"></span>
   </div>
   <!-- ===== Pass 1: Ambient glass backdrop end ===== -->
+  <div class="qpass3-scroll-progress" aria-hidden="true">
+    <span id="qpass3-scroll-progress"></span>
+  </div>
 
   <div id="loader">
     <div class="loader-row"><span class="loader-word">Qasim</span></div>
@@ -89,6 +92,7 @@
         style="animation-delay:.26s;color:rgba(255,255,255,.3);font-size:clamp(1rem,2.5vw,2rem)">Full Stack
         Developer <br> AI Engineer</span>
     </div>
+    <span class="loader-progress" id="loaderProgress" aria-label="Loading complete">100%</span>
   </div>
 
   
@@ -97,6 +101,7 @@
   <nav id="navbar" class="glass">
     <span class="nav-name">Qasim Akram</span>
     <div class="nav-links" id="navLinks">
+      <span class="nav-indicator" aria-hidden="true"></span>
       <a href="#about">About</a>
       <a href="#projects">Projects</a>
       <a href="#stack">Stack</a>
@@ -104,11 +109,12 @@
     </div>
     <div class="nav-right">
       <a href="mailto:qasimakram46@hotmail.com?subject=Hiring Inquiry&body=Hi Qasim," class="btn-nav">Hire Me</a>
-      <button class="nav-ham" id="navHam" aria-label="Menu">&#9776;</button>
+      <button class="nav-ham" id="navHam" aria-label="Open menu" aria-controls="mobileMenu"
+        aria-expanded="false">&#9776;</button>
     </div>
   </nav>
 
-  <div class="nav-mobile-menu" id="mobileMenu">
+  <div class="nav-mobile-menu glass" id="mobileMenu" aria-hidden="true" inert>
     <a href="#about">About</a>
     <div class="nav-mobile-divider"></div>
     <a href="#projects">Projects</a>
@@ -173,8 +179,8 @@
         React to ASP.NET, UI to model, idea to production. I pick up new tech fast, break things, fix them, and ship.
       </p>
       <div class="hero-cta">
-        <a href="#projects" class="btn-primary">View Work ↗</a>
-        <a href="#contact" class="btn-outline">Get in Touch</a>
+        <a href="#projects" class="btn-primary magnetic">View Work ↗</a>
+        <a href="#contact" class="btn-outline magnetic">Get in Touch</a>
       </div>
     </div>
   </section>
@@ -218,7 +224,10 @@
     <div class="sec-label">About me</div>
     <div class="about-grid">
       <div>
-        <h2 class="about-h sr sr-l">I write code<br>that ships, <div class="red-tag"><em>not<br>just runs.</em></div>
+        <h2 class="about-h sr sr-l"><span class="qpass3-heading-mask"><span>I write code</span></span><br><span
+            class="qpass3-heading-mask"><span>that ships,</span></span>
+          <div class="red-tag"><em><span class="qpass3-heading-mask"><span>not</span></span><br><span
+                class="qpass3-heading-mask"><span>just runs.</span></span></em></div>
         </h2>
         <div class="stats sr sr-l d2">
           <div class="stat">
@@ -271,7 +280,8 @@
     <div class="proj-head">
       <div>
         <div class="sec-label">Selected Work</div>
-        <h2 class="proj-h sr sr-l">Projects that<br>actually shipped.</h2>
+        <h2 class="proj-h sr sr-l"><span class="qpass3-heading-mask"><span>Projects that</span></span><br><span
+            class="qpass3-heading-mask"><span>actually shipped.</span></span></h2>
       </div>
       <a href="https://github.com/Muhammad-Qasim-Akram" target="_blank" rel="noopener" class="btn-outline sr sr-r"
         style="align-self:flex-end;">All on GitHub ↗</a>
@@ -458,13 +468,16 @@
     <!-- CONTACT -->
     <div class="section" id="contact" style="padding-top:0">
       <div class="contact-box sr">
-        <h2 class="contact-h">Let's build something <em>together.</em></h2>
+        <h2 class="contact-h">Let's build something <em><span class="qpass3-heading-mask"><span>together.</span></span></em></h2>
         <p class="contact-sub">Open to collaborations, freelance work, and interesting conversations. If you have an
           idea or opportunity, reach out.</p>
         <div class="contact-grid">
           <div class="c-links">
-            <a href="mailto:qasimakram46@gmail.com" class="c-link"><span>✉
+            <a href="mailto:qasimakram46@hotmail.com" class="c-link"><span>✉
                 qasimakram46@hotmail.com</span><span>↗</span></a>
+            <button type="button" class="c-link qpass3-copy" id="qpass3-copy-email">
+              <span>Copy email address</span><span aria-hidden="true">＋</span>
+            </button>
             <a href="https://linkedin.com/in/qasimakram" target="_blank"
               class="c-link"><span>LinkedIn</span><span>↗</span></a>
             <a href="https://github.com/Muhammad-Qasim-Akram" target="_blank"
@@ -498,6 +511,7 @@
         </div>
       </div>
     </div>
+    <div class="qpass3-toast" id="qpass3-toast" role="status" aria-live="polite"></div>
 
     <!-- FOOTER -->
     <footer>
