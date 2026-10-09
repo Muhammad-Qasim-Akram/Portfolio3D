@@ -17,8 +17,8 @@
   --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-panel: cubic-bezier(0.32, 0.72, 0, 1);
   --duration-hover: 250ms;
-  --duration-reveal: 700ms;
-  --ease-reveal-spring: cubic-bezier(0.2, 1.16, 0.35, 1);
+  --duration-reveal: 560ms;
+  --ease-reveal-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
   --glass-bg: rgba(255, 255, 255, 0.38);
   --glass-nav-bg: rgba(17, 17, 17, 0.72);
   --glass-border: rgba(255, 255, 255, 0.42);
@@ -42,30 +42,49 @@ body {
 
 #cur {
   position: fixed;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   pointer-events: none;
   z-index: 99999;
   top: 0;
   left: 0;
-  transform: translate3d(var(--cursor-x, -200px), var(--cursor-y, -200px), 0) translate(-50%, -50%);
+  transform: translate3d(-200px, -200px, 0);
   opacity: 1;
   transition: opacity 120ms ease;
 }
 #cur::before {
   position: absolute;
-  inset: 0;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  border: 1.5px solid rgba(192, 57, 43, 0.78);
-  background: radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.18) 58%, rgba(240, 197, 179, 0.2));
-  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.8);
-  -webkit-backdrop-filter: blur(5px) saturate(150%);
-  backdrop-filter: blur(5px) saturate(150%);
+  background: var(--black);
   content: "";
-  transform: scale(var(--cursor-scale, 1));
-  transition: transform var(--duration-hover) var(--ease-out);
+  transform: translate(-50%, -50%) scale(1);
+  transition: transform 150ms var(--ease-out);
 }
-#cur.big { --cursor-scale: 1.22; }
+#cur::after {
+  position: absolute;
+  inset: 2px;
+  border: 1px solid rgba(17, 17, 17, 0.72);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  transform: scale(0.55);
+  transition:
+    opacity 120ms ease,
+    transform 180ms var(--ease-out);
+}
+#cur.big::before {
+  transform: translate(-50%, -50%) scale(0.65);
+}
+#cur.big::after {
+  opacity: 1;
+  transform: scale(1);
+}
 body:not(:hover) #cur {
   opacity: 0;
 }
@@ -327,6 +346,9 @@ nav.blur {
   margin: 0 auto;
   position: relative;
   overflow: hidden;
+  transform: scale(var(--hero-scroll-scale, 1));
+  transform-origin: center center;
+  opacity: var(--hero-scroll-opacity, 1);
 }
 .hero-bg-word {
   position: absolute;
@@ -1490,19 +1512,19 @@ footer {
   transform: none;
 }
 .d1 {
-  transition-delay: 0.07s;
+  transition-delay: 0.05s;
 }
 .d2 {
-  transition-delay: 0.14s;
+  transition-delay: 0.1s;
 }
 .d3 {
-  transition-delay: 0.21s;
+  transition-delay: 0.15s;
 }
 .d4 {
-  transition-delay: 0.28s;
+  transition-delay: 0.2s;
 }
 .d5 {
-  transition-delay: 0.35s;
+  transition-delay: 0.25s;
 }
 
 /* ─── RESPONSIVE ─── */
@@ -2513,9 +2535,9 @@ body.qpass2-ready .scroll-hint {
 .sr-l,
 .sr-r {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(32px);
   transition:
-    opacity var(--duration-reveal) var(--ease-reveal-spring),
+    opacity var(--duration-reveal) var(--ease-out),
     transform var(--duration-reveal) var(--ease-reveal-spring);
 }
 .sr.in,
@@ -3092,6 +3114,10 @@ footer.glass .back-top:hover {
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  #hero {
+    transform: none;
+    opacity: 1;
+  }
   .ticker-track {
     animation: none !important;
   }
@@ -3154,13 +3180,13 @@ footer.glass .back-top:hover {
   .sr,
   .sr-l,
   .sr-r {
-    transition-duration: 460ms;
+    transition-duration: 440ms;
     transition-delay: 0ms;
   }
   .sr,
   .sr-l,
   .sr-r {
-    transform: translateY(16px);
+    transform: translateY(24px);
   }
 }
 
