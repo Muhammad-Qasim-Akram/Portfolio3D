@@ -37,72 +37,7 @@ body {
   background: var(--bg);
   color: var(--black);
   overflow-x: hidden;
-  cursor: none;
-}
-
-#cur {
-  position: fixed;
-  width: 46px;
-  height: 46px;
-  pointer-events: none;
-  z-index: 99999;
-  top: 0;
-  left: 0;
-  transform: translate3d(-200px, -200px, 0);
-  opacity: 1;
-  transition: opacity 80ms ease;
-}
-#cur::before {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 11px;
-  height: 11px;
-  border-radius: 50%;
-  background: var(--black);
-  box-shadow: 0 1px 5px rgba(17, 17, 17, 0.42);
-  content: "";
-  transform: translate(-50%, -50%) scale(1);
-  transition: transform 150ms var(--ease-out);
-}
-#cur::after {
-  position: absolute;
-  inset: 1px;
-  border: 1.5px solid rgba(17, 17, 17, 0.86);
-  border-radius: 50%;
-  background: transparent;
-  box-shadow: 0 1px 5px rgba(17, 17, 17, 0.18);
-  content: "";
-  pointer-events: none;
-  opacity: 0;
-  transform: scale(0.55);
-  transition:
-    opacity 120ms ease,
-    transform 180ms var(--ease-out);
-}
-#cur.native {
-  opacity: 0;
-}
-#cur.big::before {
-  transform: translate(-50%, -50%) scale(0.65);
-}
-#cur.big::after {
-  opacity: 1;
-  transform: scale(0.86);
-  border-color: var(--red);
-}
-a,
-button,
-[role="button"],
-select {
-  cursor: pointer;
-}
-input,
-textarea {
-  cursor: text;
-}
-body:not(:hover) #cur {
-  opacity: 0;
+  cursor: default;
 }
 
 #loader {
@@ -268,7 +203,6 @@ nav.blur {
   padding: 9px 20px;
   font-size: 0.78rem;
   font-weight: 700;
-  cursor: none;
   text-decoration: none;
   transition: transform var(--duration-hover) var(--ease-out);
   font-family: "Inter", sans-serif;
@@ -692,7 +626,6 @@ nav.blur {
   padding: 14px 34px;
   font-size: 0.84rem;
   font-weight: 700;
-  cursor: none;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -713,7 +646,6 @@ nav.blur {
   padding: 13px 34px;
   font-size: 0.84rem;
   font-weight: 500;
-  cursor: none;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -1386,7 +1318,6 @@ nav.blur {
   padding: 12px 22px;
   font-size: 0.84rem;
   font-weight: 700;
-  cursor: none;
   transition: all 0.2s;
   font-family: "Inter", sans-serif;
 }
@@ -2309,12 +2240,6 @@ html {
   .glass::after {
     display: none;
   }
-  body {
-    cursor: auto;
-  }
-  #cur {
-    display: none !important;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   .ambient-blob {
@@ -2462,20 +2387,8 @@ body.qpass2-ready .scroll-hint {
   .btn-nav {
     cursor: pointer;
   }
-  body {
-    cursor: auto;
-  }
-  #cur {
-    display: none !important;
-  }
 }
 @media (prefers-reduced-motion: reduce) {
-  body {
-    cursor: auto;
-  }
-  #cur {
-    display: none !important;
-  }
   .nav-mobile-menu {
     transition: none;
     transform: none;
@@ -3544,6 +3457,47 @@ footer.glass .back-top:hover {
 @media (max-width: 640px) and (prefers-reduced-motion: reduce) {
   .ambient-blob-one {
     animation: none;
+  }
+}
+
+/* Shared button motion: match the hero CTA without changing button styling. */
+button:not(:disabled),
+.btn-primary,
+.btn-outline,
+.btn-nav,
+.back-link,
+.current-project-link {
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) ease,
+    border-color var(--duration-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  button:not(:disabled):hover,
+  .btn-primary:not(.magnetic):hover,
+  .btn-outline:not(.magnetic):hover,
+  .btn-nav:hover,
+  .back-link:hover,
+  .current-project-link:hover {
+    transform: translateY(-3px);
+  }
+  .hero-cta .magnetic:hover,
+  .c-link.magnetic:hover {
+    transform: translate3d(
+      var(--mag-x, 0px),
+      calc(var(--mag-y, 0px) - 3px),
+      0
+    );
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  button:not(:disabled),
+  .btn-primary,
+  .btn-outline,
+  .btn-nav,
+  .back-link,
+  .current-project-link {
+    transition: none !important;
   }
 }
 

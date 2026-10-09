@@ -33,30 +33,6 @@ if (document.readyState === "complete") {
   window.setTimeout(startPageLoaderExit, 900);
 }
 
-const cur = document.getElementById("cur");
-const nativeCursorTargets =
-  "a,button,[role='button'],[role='link'],[role='menuitem'],select,summary,input,textarea";
-const highlightedCursorTargets = ".proj-card,.svc-row,.sk,.stat,.c-link";
-document.addEventListener("pointerover", (event) => {
-  if (!(event.target instanceof Element)) return;
-  if (event.target.closest(nativeCursorTargets)) {
-    cur.classList.add("native");
-    cur.classList.remove("big");
-  } else if (event.target.closest(highlightedCursorTargets)) {
-    cur.classList.add("big");
-  }
-});
-document.addEventListener("pointerout", (event) => {
-  if (!(event.target instanceof Element)) return;
-  const previousTarget = event.target.closest(`${nativeCursorTargets},${highlightedCursorTargets}`);
-  if (!previousTarget) return;
-  const nextTarget =
-    event.relatedTarget instanceof Element
-      ? event.relatedTarget.closest(`${nativeCursorTargets},${highlightedCursorTargets}`)
-      : null;
-  if (previousTarget === nextTarget) return;
-  cur.classList.remove("big", "native");
-});
 const scrollTasks = new Set();
 let scrollFrame = 0;
 
@@ -913,8 +889,6 @@ const BOT_DATA = {
         pointerTarget = target;
         pointerX = event.clientX;
         pointerY = event.clientY;
-        cur.style.transform =
-          `translate3d(${pointerX}px, ${pointerY}px, 0) translate(-50%, -50%)`;
         if (pointerFrame) return;
 
         pointerFrame = window.requestAnimationFrame(() => {
