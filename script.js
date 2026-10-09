@@ -467,15 +467,20 @@ const BOT_DATA = {
       link: "https://github.com/Muhammad-Qasim-Akram/Stock-Price-Prediction"
     }
   ],
-  education: "TODO: Add your education details.",
-  certs: ["TODO: Add certifications, or replace this with an empty array if you have none."],
+  education: "I'm pursuing a BS in Computer Science at The Islamia University of Bahawalpur. I'm currently in my 7th semester and expect to graduate in 2027.",
+  certs: [
+    "Advanced MySQL Topics — Meta (September 2025)",
+    "Supervised Machine Learning: Regression & Classification — Stanford / DeepLearning.AI (December 2025)",
+    "Python for Data Science, AI & Development — IBM (October 2025)"
+  ],
   contact: {
     email: "qasimakram46@hotmail.com",
     github: "https://github.com/Muhammad-Qasim-Akram",
-    linkedin: "https://linkedin.com/in/qasimakram"
+    linkedin: "https://linkedin.com/in/qasimakram",
+    whatsapp: "https://wa.me/923126442266"
   },
   resumeUrl: "img/Muhammad_Qasim_Akram_Resume.pdf",
-  availability: "Open to collaborations, freelance work, and interesting opportunities."
+  availability: "I'm open to internships and junior full-stack or AI engineering roles, freelance projects, and collaborations. I'm based in Pakistan and happy to connect about remote opportunities."
 };
 
 (() => {
@@ -663,6 +668,8 @@ const BOT_DATA = {
             { text: "GitHub", url: BOT_DATA.contact.github },
             { text: " and " },
             { text: "LinkedIn", url: BOT_DATA.contact.linkedin },
+            { text: ", or message me on " },
+            { text: "WhatsApp ↗", url: BOT_DATA.contact.whatsapp },
             { text: "." }
           ],
           chips: ["/hire", "/projects", "/resume"]
@@ -744,7 +751,7 @@ const BOT_DATA = {
     const text = value.toLowerCase();
     if (/\b(project|work|portfolio)\b/.test(text)) return "/projects";
     if (/\b(skill|stack|tech|technology|technologies)\b/.test(text)) return "/stack";
-    if (/\b(contact|email|github|linkedin)\b/.test(text)) return "/contact";
+    if (/\b(contact|email|github|linkedin|whatsapp)\b/.test(text)) return "/contact";
     if (/\b(hire|hiring|job|freelance|available)\b/.test(text)) return "/hire";
     if (/\b(education|study|degree|university)\b/.test(text)) return "/education";
     if (/\b(resume|cv)\b/.test(text)) return "/resume";

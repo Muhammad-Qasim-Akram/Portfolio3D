@@ -71,6 +71,7 @@ Portfolio3D/
 ## Contact
 
 - **Email:** [qasimakram46@hotmail.com](mailto:qasimakram46@hotmail.com)
+- **WhatsApp:** [+92 312 6442266](https://wa.me/923126442266)
 - **GitHub:** [Muhammad-Qasim-Akram](https://github.com/Muhammad-Qasim-Akram)
 - **LinkedIn:** [qasimakram](https://linkedin.com/in/qasimakram)
 
