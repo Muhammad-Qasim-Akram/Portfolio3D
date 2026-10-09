@@ -4,8 +4,9 @@ let loaderStarted = false;
 
 function finishPageLoader() {
   const heroName = document.querySelector(".hero-hey .word-name");
-  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (!reduceMotion && heroName) scrambleText(heroName, heroName.textContent, 500);
+  if (shouldScrambleText() && heroName) {
+    scrambleText(heroName, heroName.textContent, 500);
+  }
   document.body.classList.add("qpass2-ready");
   loader.remove();
 }
@@ -36,8 +37,16 @@ const cur = document.getElementById("cur");
 document
   .querySelectorAll("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
   .forEach((el) => {
-    el.addEventListener("mouseenter", () => cur.classList.add("big"));
-    el.addEventListener("mouseleave", () => cur.classList.remove("big"));
+    el.addEventListener("mouseenter", () => {
+      if (el.closest(".nav-links")) {
+        cur.classList.add("nav-hover");
+        return;
+      }
+      cur.classList.add("big");
+    });
+    el.addEventListener("mouseleave", () => {
+      cur.classList.remove("big", "nav-hover");
+    });
   });
 document.querySelectorAll("input,textarea").forEach((el) => {
   el.addEventListener("mouseenter", () => cur.classList.add("txt"));
@@ -45,17 +54,27 @@ document.querySelectorAll("input,textarea").forEach((el) => {
 });
 if ("ontouchstart" in window) cur.style.display = "none";
 
-window.addEventListener(
-  "scroll",
-  () => {
-    const scrolled = window.scrollY > 50;
-    document
-      .getElementById("navbar")
-      .classList.toggle("blur", scrolled);
-    document.getElementById("navbar").classList.toggle("scrolled", scrolled);
-  },
-  { passive: true },
-);
+const scrollTasks = new Set();
+let scrollFrame = 0;
+
+function scheduleScrollWork() {
+  if (scrollFrame) return;
+  scrollFrame = window.requestAnimationFrame(() => {
+    scrollFrame = 0;
+    scrollTasks.forEach((task) => task());
+  });
+}
+
+window.addEventListener("scroll", scheduleScrollWork, { passive: true });
+window.addEventListener("resize", scheduleScrollWork, { passive: true });
+
+function updateNavbarScroll() {
+  const scrolled = window.scrollY > 50;
+  document.getElementById("navbar").classList.toggle("blur", scrolled);
+  document.getElementById("navbar").classList.toggle("scrolled", scrolled);
+}
+scrollTasks.add(updateNavbarScroll);
+updateNavbarScroll();
 
 const navHam = document.getElementById("navHam");
 const mobileMenu = document.getElementById("mobileMenu");
@@ -95,6 +114,17 @@ const navSectionIds = new Set(
 );
 const navLinks = document.getElementById("navLinks");
 let activeNavHref = "";
+let activeSectionId = "";
+let navSectionPositions = [];
+
+function refreshNavSectionPositions() {
+  navSectionPositions = Array.from(
+    document.querySelectorAll("section[id], .section[id]"),
+  )
+    .filter((section) => navSectionIds.has(section.id))
+    .map((section) => ({ id: section.id, top: section.offsetTop }))
+    .sort((first, second) => first.top - second.top);
+}
 
 function updateNavIndicator() {
   const activeLink = navLinks.querySelector("a.active");
@@ -112,33 +142,33 @@ function updateNavIndicator() {
 
 function updateActiveNavigation() {
   let active = "";
-  document.querySelectorAll("section[id], .section[id]").forEach((section) => {
-    if (
-      navSectionIds.has(section.id) &&
-      window.scrollY >= section.offsetTop - 240
-    ) {
-      active = section.id;
-    }
-  });
+  const currentPosition = window.scrollY + 240;
+  for (const section of navSectionPositions) {
+    if (currentPosition < section.top) break;
+    active = section.id;
+  }
+  if (active === activeSectionId) return;
+  activeSectionId = active;
   navAs.forEach((link) =>
     link.classList.toggle("active", link.getAttribute("href") === `#${active}`),
   );
   updateNavIndicator();
 }
 
-window.addEventListener(
-  "scroll",
-  updateActiveNavigation,
-  { passive: true },
-);
-window.addEventListener(
-  "resize",
-  () => {
-    activeNavHref = "";
-    updateNavIndicator();
-  },
-  { passive: true },
-);
+scrollTasks.add(updateActiveNavigation);
+refreshNavSectionPositions();
+window.addEventListener("load", () => {
+  refreshNavSectionPositions();
+  activeNavHref = "";
+  activeSectionId = "";
+  scheduleScrollWork();
+}, { once: true });
+window.addEventListener("resize", () => {
+  refreshNavSectionPositions();
+  activeNavHref = "";
+  activeSectionId = "";
+  scheduleScrollWork();
+}, { passive: true });
 updateActiveNavigation();
 
 const io = new IntersectionObserver(
@@ -307,6 +337,10 @@ function handleSubmit() {
 
 const CHARS = 'z0156789!@#$§]⌈⟫※¥↨▩▭▤∄⋿∑:)%&~<>/|}{[]';
 
+function shouldScrambleText() {
+  return window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 function scrambleText(el, finalText, duration = 750) {
   if (!finalText || !finalText.trim()) return;
@@ -377,7 +411,7 @@ function scrambleTextWithBR(el, duration = 800) {
 
 (function () {
   document.querySelectorAll('.loader-word, .loader-progress').forEach((el) => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!shouldScrambleText()) return;
     if (el.textContent.toLowerCase().includes('full stack') || el.textContent.toLowerCase().includes('ai engineer')) return;
     const originalHTML = el.innerHTML;
     const hasBreak = el.querySelector('br');
@@ -494,7 +528,7 @@ const BOT_DATA = {
     const message = document.createElement("div");
     message.className = `qbot-message qbot-${kind}`;
     if (typeof content === "string") {
-      if (kind === "bot" && !reduceMotion.matches) {
+      if (kind === "bot" && shouldScrambleText()) {
         appendScrambledText(message, content);
       } else {
         message.textContent = content;
@@ -510,7 +544,7 @@ const BOT_DATA = {
           link.textContent = part.text;
           message.append(link);
         } else {
-          if (kind === "bot" && !reduceMotion.matches) {
+          if (kind === "bot" && shouldScrambleText()) {
             appendScrambledText(message, part.text);
           } else {
             message.append(document.createTextNode(part.text));
@@ -560,7 +594,7 @@ const BOT_DATA = {
   }
 
   function scrambleBotTitle() {
-    if (reduceMotion.matches) return;
+    if (!shouldScrambleText()) return;
     const finalText = botTitle.textContent;
     let frame = 0;
     const totalFrames = 10;
@@ -894,8 +928,8 @@ const BOT_DATA = {
             const bounds = tiltTarget.getBoundingClientRect();
             const horizontal = (pointerX - bounds.left) / bounds.width - 0.5;
             const vertical = (pointerY - bounds.top) / bounds.height - 0.5;
-            const rotateX = Math.max(-5, Math.min(5, -vertical * 10));
-            const rotateY = Math.max(-5, Math.min(5, horizontal * 10));
+            const rotateX = Math.max(-3, Math.min(3, -vertical * 6));
+            const rotateY = Math.max(-3, Math.min(3, horizontal * 6));
             tiltTarget.style.setProperty("--qpass3-tilt-x", `${rotateY}deg`);
             tiltTarget.style.setProperty("--qpass3-tilt-y", `${rotateX}deg`);
           }
@@ -938,22 +972,21 @@ const BOT_DATA = {
   });
 
   const progress = document.getElementById("qpass3-scroll-progress");
-  let progressFrame = 0;
+  let maxScroll = 0;
+
+  function refreshScrollRange() {
+    maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+  }
 
   function updateProgress() {
-    progressFrame = 0;
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-    const amount = scrollable > 0 ? window.scrollY / scrollable : 0;
+    const amount = maxScroll > 0 ? window.scrollY / maxScroll : 0;
     progress.style.transform = `scaleX(${Math.max(0, Math.min(1, amount))})`;
   }
 
-  function scheduleProgressUpdate() {
-    if (progressFrame) return;
-    progressFrame = window.requestAnimationFrame(updateProgress);
-  }
-
-  window.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
-  window.addEventListener("resize", scheduleProgressUpdate, { passive: true });
+  scrollTasks.add(updateProgress);
+  window.addEventListener("resize", refreshScrollRange, { passive: true });
+  window.addEventListener("load", refreshScrollRange, { once: true });
+  refreshScrollRange();
   updateProgress();
 
   const stats = document.querySelector(".stats");
