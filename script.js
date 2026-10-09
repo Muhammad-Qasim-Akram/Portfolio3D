@@ -34,23 +34,25 @@ if (document.readyState === "complete") {
 }
 
 const cur = document.getElementById("cur");
-document
-  .querySelectorAll("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
-  .forEach((el) => {
-    el.addEventListener("mouseenter", () => {
-      if (el.closest(".nav-links")) {
-        cur.classList.add("nav-hover");
-        return;
-      }
-      cur.classList.add("big");
-    });
-    el.addEventListener("mouseleave", () => {
-      cur.classList.remove("big", "nav-hover");
-    });
-  });
-document.querySelectorAll("input,textarea").forEach((el) => {
-  el.addEventListener("mouseenter", () => cur.classList.add("txt"));
-  el.addEventListener("mouseleave", () => cur.classList.remove("txt"));
+document.addEventListener("pointerover", (event) => {
+  if (
+    event.target instanceof Element &&
+    event.target.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
+  ) {
+    cur.classList.add("big");
+  }
+});
+document.addEventListener("pointerout", (event) => {
+  if (
+    event.target instanceof Element &&
+    event.target.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link") &&
+    !(
+      event.relatedTarget instanceof Element &&
+      event.relatedTarget.closest("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
+    )
+  ) {
+    cur.classList.remove("big");
+  }
 });
 if ("ontouchstart" in window) cur.style.display = "none";
 
@@ -970,24 +972,6 @@ const BOT_DATA = {
   document.querySelectorAll(".proj-card").forEach((card) => {
     card.classList.add("qpass3-tilt");
   });
-
-  const progress = document.getElementById("qpass3-scroll-progress");
-  let maxScroll = 0;
-
-  function refreshScrollRange() {
-    maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-  }
-
-  function updateProgress() {
-    const amount = maxScroll > 0 ? window.scrollY / maxScroll : 0;
-    progress.style.transform = `scaleX(${Math.max(0, Math.min(1, amount))})`;
-  }
-
-  scrollTasks.add(updateProgress);
-  window.addEventListener("resize", refreshScrollRange, { passive: true });
-  window.addEventListener("load", refreshScrollRange, { once: true });
-  refreshScrollRange();
-  updateProgress();
 
   const stats = document.querySelector(".stats");
   const statNumbers = stats ? Array.from(stats.querySelectorAll(".sn")) : [];
