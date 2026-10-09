@@ -2368,15 +2368,6 @@ body.qpass2-ready .scroll-hint {
   from { opacity: 0; transform: translateY(18px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.hero-cta .magnetic {
-  --mag-x: 0px;
-  --mag-y: 0px;
-  transform: translate3d(var(--mag-x), var(--mag-y), 0);
-  transition: transform var(--duration-hover) var(--ease-out);
-}
-.hero-cta .magnetic:hover {
-  transform: translate3d(var(--mag-x), calc(var(--mag-y) - 2px), 0);
-}
 @media (hover: none) {
   .hero-cta .magnetic {
     transform: none;
@@ -2983,16 +2974,6 @@ footer.glass .back-top:hover {
   text-align: left;
   cursor: pointer;
 }
-.c-link.magnetic {
-  --mag-x: 0px;
-  --mag-y: 0px;
-  transform: translate3d(var(--mag-x), var(--mag-y), 0);
-  transition: transform var(--duration-hover) var(--ease-out);
-}
-.c-link.magnetic:hover {
-  transform: translate3d(var(--mag-x), calc(var(--mag-y) - 1px), 0);
-}
-
 .qpass3-toast {
   position: fixed;
   z-index: 1300;
@@ -3481,14 +3462,6 @@ button:not(:disabled),
   .current-project-link:hover {
     transform: translateY(-3px);
   }
-  .hero-cta .magnetic:hover,
-  .c-link.magnetic:hover {
-    transform: translate3d(
-      var(--mag-x, 0px),
-      calc(var(--mag-y, 0px) - 3px),
-      0
-    );
-  }
 }
 @media (prefers-reduced-motion: reduce) {
   button:not(:disabled),
@@ -3497,6 +3470,30 @@ button:not(:disabled),
   .btn-nav,
   .back-link,
   .current-project-link {
+    transition: none !important;
+  }
+}
+
+.magnetic {
+  --mag-x: 0px;
+  --mag-y: 0px;
+  transform: translate3d(var(--mag-x), var(--mag-y), 0);
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    background-color var(--duration-hover) ease,
+    border-color var(--duration-hover) ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .magnetic:hover,
+  .magnetic:focus-visible {
+    transform: translate3d(var(--mag-x), calc(var(--mag-y) - 2px), 0);
+  }
+}
+@media (hover: none), (prefers-reduced-motion: reduce) {
+  .magnetic,
+  .magnetic:hover,
+  .magnetic:focus-visible {
+    transform: none !important;
     transition: none !important;
   }
 }

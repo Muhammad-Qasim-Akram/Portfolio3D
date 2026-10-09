@@ -36,6 +36,12 @@ if (document.readyState === "complete") {
 const scrollTasks = new Set();
 let scrollFrame = 0;
 
+document
+  .querySelectorAll(
+    "button:not(:disabled), .btn-primary, .btn-outline, .btn-nav, .btn-send, .current-project-link, .back-link, .c-link",
+  )
+  .forEach((element) => element.classList.add("magnetic"));
+
 function scheduleScrollWork() {
   if (scrollFrame) return;
   scrollFrame = window.requestAnimationFrame(() => {
@@ -817,9 +823,6 @@ const BOT_DATA = {
 // ===== Pass 1: Glass pointer and ambient lifecycle start =====
 (() => {
   const backdrop = document.getElementById("ambientBackdrop");
-  const canUsePointerGlow =
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
-    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   let backdropIsVisible = false;
   let pointerFrame = 0;
   let pointerTarget = null;
@@ -864,87 +867,92 @@ const BOT_DATA = {
     );
   }
 
-  if (canUsePointerGlow) {
-    document.addEventListener(
-      "pointermove",
-      (event) => {
-        const target =
-          event.target instanceof Element
-            ? event.target.closest(".glass, .qbot-launcher")
-            : null;
-        magneticTarget =
-          event.target instanceof Element ? event.target.closest(".magnetic") : null;
-        tiltTarget =
-          event.target instanceof Element ? event.target.closest(".proj-card") : null;
-        if (previousMagneticTarget && previousMagneticTarget !== magneticTarget) {
-          previousMagneticTarget.style.setProperty("--mag-x", "0px");
-          previousMagneticTarget.style.setProperty("--mag-y", "0px");
-        }
-        if (previousTiltTarget && previousTiltTarget !== tiltTarget) {
-          previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
-          previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
-        }
-        previousMagneticTarget = magneticTarget;
-        previousTiltTarget = tiltTarget;
-        pointerTarget = target;
-        pointerX = event.clientX;
-        pointerY = event.clientY;
-        if (pointerFrame) return;
+  document.addEventListener(
+    "pointermove",
+    (event) => {
+      if (
+        !window.matchMedia("(hover: hover) and (pointer: fine)").matches ||
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        event.pointerType !== "mouse"
+      ) {
+        return;
+      }
+      const target =
+        event.target instanceof Element
+          ? event.target.closest(".glass, .qbot-launcher")
+          : null;
+      magneticTarget =
+        event.target instanceof Element ? event.target.closest(".magnetic") : null;
+      tiltTarget =
+        event.target instanceof Element ? event.target.closest(".proj-card") : null;
+      if (previousMagneticTarget && previousMagneticTarget !== magneticTarget) {
+        previousMagneticTarget.style.setProperty("--mag-x", "0px");
+        previousMagneticTarget.style.setProperty("--mag-y", "0px");
+      }
+      if (previousTiltTarget && previousTiltTarget !== tiltTarget) {
+        previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
+        previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
+      }
+      previousMagneticTarget = magneticTarget;
+      previousTiltTarget = tiltTarget;
+      pointerTarget = target;
+      pointerX = event.clientX;
+      pointerY = event.clientY;
+      if (pointerFrame) return;
 
-        pointerFrame = window.requestAnimationFrame(() => {
-          pointerFrame = 0;
-          if (pointerTarget && pointerTarget.isConnected) {
-            const bounds = pointerTarget.getBoundingClientRect();
-            const x = bounds.width ? ((pointerX - bounds.left) / bounds.width) * 100 : 50;
-            const y = bounds.height ? ((pointerY - bounds.top) / bounds.height) * 100 : 50;
-            pointerTarget.style.setProperty("--mx", `${x}%`);
-            pointerTarget.style.setProperty("--my", `${y}%`);
-          }
-          if (magneticTarget && magneticTarget.isConnected) {
-            const bounds = magneticTarget.getBoundingClientRect();
-            const x = Math.max(-8, Math.min(8, (pointerX - bounds.left - bounds.width / 2) * 0.12));
-            const y = Math.max(-8, Math.min(8, (pointerY - bounds.top - bounds.height / 2) * 0.12));
-            magneticTarget.style.setProperty("--mag-x", `${x}px`);
-            magneticTarget.style.setProperty("--mag-y", `${y}px`);
-          }
-          if (tiltTarget && tiltTarget.isConnected) {
-            const bounds = tiltTarget.getBoundingClientRect();
-            const horizontal = (pointerX - bounds.left) / bounds.width - 0.5;
-            const vertical = (pointerY - bounds.top) / bounds.height - 0.5;
-            const rotateX = Math.max(-3, Math.min(3, -vertical * 6));
-            const rotateY = Math.max(-3, Math.min(3, horizontal * 6));
-            tiltTarget.style.setProperty("--qpass3-tilt-x", `${rotateY}deg`);
-            tiltTarget.style.setProperty("--qpass3-tilt-y", `${rotateX}deg`);
-          }
-          if (backdropIsVisible) {
-            const parallaxX = ((pointerX / window.innerWidth) - 0.5) * 16;
-            const parallaxY = ((pointerY / window.innerHeight) - 0.5) * 12;
-            backdrop.style.setProperty("--parallax-x", `${parallaxX}px`);
-            backdrop.style.setProperty("--parallax-y", `${parallaxY}px`);
-          }
-        });
-      },
-      { passive: true },
-    );
-    document.addEventListener(
-      "pointerout",
-      (event) => {
-        if (!event.relatedTarget && previousMagneticTarget) {
-          previousMagneticTarget.style.setProperty("--mag-x", "0px");
-          previousMagneticTarget.style.setProperty("--mag-y", "0px");
-          previousMagneticTarget = null;
-          magneticTarget = null;
+      pointerFrame = window.requestAnimationFrame(() => {
+        pointerFrame = 0;
+        if (pointerTarget && pointerTarget.isConnected) {
+          const bounds = pointerTarget.getBoundingClientRect();
+          const x = bounds.width ? ((pointerX - bounds.left) / bounds.width) * 100 : 50;
+          const y = bounds.height ? ((pointerY - bounds.top) / bounds.height) * 100 : 50;
+          pointerTarget.style.setProperty("--mx", `${x}%`);
+          pointerTarget.style.setProperty("--my", `${y}%`);
         }
-        if (!event.relatedTarget && previousTiltTarget) {
-          previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
-          previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
-          previousTiltTarget = null;
-          tiltTarget = null;
+        if (magneticTarget && magneticTarget.isConnected) {
+          const bounds = magneticTarget.getBoundingClientRect();
+          const x = Math.max(-8, Math.min(8, (pointerX - bounds.left - bounds.width / 2) * 0.12));
+          const y = Math.max(-8, Math.min(8, (pointerY - bounds.top - bounds.height / 2) * 0.12));
+          magneticTarget.style.setProperty("--mag-x", `${x}px`);
+          magneticTarget.style.setProperty("--mag-y", `${y}px`);
         }
-      },
-      { passive: true },
-    );
-  }
+        if (tiltTarget && tiltTarget.isConnected) {
+          const bounds = tiltTarget.getBoundingClientRect();
+          const horizontal = (pointerX - bounds.left) / bounds.width - 0.5;
+          const vertical = (pointerY - bounds.top) / bounds.height - 0.5;
+          const rotateX = Math.max(-3, Math.min(3, -vertical * 6));
+          const rotateY = Math.max(-3, Math.min(3, horizontal * 6));
+          tiltTarget.style.setProperty("--qpass3-tilt-x", `${rotateY}deg`);
+          tiltTarget.style.setProperty("--qpass3-tilt-y", `${rotateX}deg`);
+        }
+        if (backdropIsVisible) {
+          const parallaxX = ((pointerX / window.innerWidth) - 0.5) * 16;
+          const parallaxY = ((pointerY / window.innerHeight) - 0.5) * 12;
+          backdrop.style.setProperty("--parallax-x", `${parallaxX}px`);
+          backdrop.style.setProperty("--parallax-y", `${parallaxY}px`);
+        }
+      });
+    },
+    { passive: true },
+  );
+  document.addEventListener(
+    "pointerout",
+    (event) => {
+      if (!event.relatedTarget && previousMagneticTarget) {
+        previousMagneticTarget.style.setProperty("--mag-x", "0px");
+        previousMagneticTarget.style.setProperty("--mag-y", "0px");
+        previousMagneticTarget = null;
+        magneticTarget = null;
+      }
+      if (!event.relatedTarget && previousTiltTarget) {
+        previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
+        previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
+        previousTiltTarget = null;
+        tiltTarget = null;
+      }
+    },
+    { passive: true },
+  );
 })();
 // ===== Pass 1: Glass pointer and ambient lifecycle end =====
 
