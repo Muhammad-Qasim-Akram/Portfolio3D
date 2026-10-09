@@ -908,6 +908,75 @@ nav.blur {
   gap: 18px;
   margin-bottom: 40px;
 }
+.current-project {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 28px;
+  margin-bottom: 44px;
+  padding: 26px 28px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: var(--black);
+  color: var(--white);
+}
+.current-project-copy {
+  min-width: 0;
+}
+.current-project-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 9px;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.current-project-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.12);
+}
+.current-project-title {
+  margin-bottom: 5px;
+  font-family: "Syne", sans-serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+.current-project-desc {
+  max-width: 650px;
+  margin-bottom: 12px;
+  color: rgba(255, 255, 255, 0.68);
+  font-size: 0.78rem;
+  line-height: 1.65;
+}
+.current-project .proj-tags span {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.75);
+}
+.current-project-link {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: 9px;
+  background: var(--white);
+  color: var(--black);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.current-project-link:hover {
+  transform: translateY(-2px);
+  background: var(--bg);
+}
 .proj-card {
   background: var(--bg2);
   border-radius: 16px;
@@ -1431,6 +1500,13 @@ footer {
   }
   .proj-grid {
     grid-template-columns: 1fr;
+  }
+  .current-project {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 18px;
+    margin-bottom: 36px;
+    padding: 22px;
   }
   .proj-grid .proj-card:last-child {
     grid-column: 1;

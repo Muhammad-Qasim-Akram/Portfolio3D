@@ -469,14 +469,19 @@ function scrambleEl(el, duration) {
 const BOT_DATA = {
   name: "Muhammad Qasim Akram",
   role: "Full Stack Developer & AI Engineer",
-  intro: "Hey, I'm Qasim — a full stack developer and AI engineer from Pakistan. I build useful products across React frontends, Django and Node.js backends, and AI systems. I like taking ideas from the first line of code all the way to a live deployment.",
+  intro: "Hey, I'm Qasim — a full stack developer and AI engineer from Pakistan. I build useful products across React frontends, ASP.NET, Node.js and Django backends, and AI systems. I'm currently building SmartSpend, an expense-tracking app backend with ASP.NET and PostgreSQL.",
   stack: {
     frontend: ["React.js", "JavaScript", "TypeScript", "HTML", "CSS"],
-    backend: ["Python", "Django", "Node.js", "REST APIs", "WebSockets", "PostgreSQL", "MongoDB", "Redis"],
+    backend: ["ASP.NET", "Node.js", "Django", "Python", "REST APIs", "WebSockets", "PostgreSQL", "MongoDB", "Redis"],
     ai: ["YOLOv8", "OpenCV", "Computer Vision", "LLM APIs", "LLaMA 3"],
     tools: ["Git & GitHub", "Azure", "Vercel", "Netlify", "GitHub Actions", "Railway"]
   },
   projects: [
+    {
+      name: "SmartSpend — Expense Tracking Backend (In Progress)",
+      description: "The backend for an expense-tracking app with categorized spending and budgets, built with ASP.NET and PostgreSQL.",
+      link: "https://github.com/Muhammad-Qasim-Akram/Smartspend.Api"
+    },
     {
       name: "ChatRoom — Real-Time Chat App",
       description: "A real-time room-based chat app built with Django Channels, WebSockets, and Redis.",
