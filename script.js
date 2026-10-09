@@ -806,3 +806,59 @@ const BOT_DATA = {
 })();
 
 // ===== Chatbot script end =====
+
+// ===== Pass 1: Glass pointer and ambient lifecycle start =====
+(() => {
+  const backdrop = document.getElementById("ambientBackdrop");
+  const canUsePointerGlow =
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches &&
+    !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let backdropIsVisible = false;
+  let pointerFrame = 0;
+  let pointerTarget = null;
+  let pointerX = 0;
+  let pointerY = 0;
+
+  function updateBackdropState() {
+    backdrop.classList.toggle(
+      "is-paused",
+      document.hidden || !backdropIsVisible,
+    );
+  }
+
+  const backdropObserver = new IntersectionObserver(([entry]) => {
+    backdropIsVisible = entry.isIntersecting;
+    backdrop.classList.toggle("is-visible", backdropIsVisible);
+    updateBackdropState();
+  });
+  backdropObserver.observe(backdrop);
+
+  document.addEventListener("visibilitychange", updateBackdropState, {
+    passive: true,
+  });
+
+  if (canUsePointerGlow) {
+    document.addEventListener(
+      "pointermove",
+      (event) => {
+        pointerTarget =
+          event.target instanceof Element ? event.target.closest(".glass") : null;
+        pointerX = event.clientX;
+        pointerY = event.clientY;
+        if (!pointerTarget || pointerFrame) return;
+
+        pointerFrame = window.requestAnimationFrame(() => {
+          pointerFrame = 0;
+          if (!pointerTarget || !pointerTarget.isConnected) return;
+          const bounds = pointerTarget.getBoundingClientRect();
+          const x = ((pointerX - bounds.left) / bounds.width) * 100;
+          const y = ((pointerY - bounds.top) / bounds.height) * 100;
+          pointerTarget.style.setProperty("--mx", `${x}%`);
+          pointerTarget.style.setProperty("--my", `${y}%`);
+        });
+      },
+      { passive: true },
+    );
+  }
+})();
+// ===== Pass 1: Glass pointer and ambient lifecycle end =====
