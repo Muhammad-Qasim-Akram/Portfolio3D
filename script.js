@@ -1,4 +1,3 @@
-//PAGE LOADER
 const loader = document.getElementById("loader");
 let loaderStarted = false;
 
@@ -424,7 +423,6 @@ function scrambleTextWithBR(el, duration = 800) {
   });
 })();
 
-// ===== Chatbot script start =====
 const BOT_DATA = {
   name: "Muhammad Qasim Akram",
   role: "Full Stack Developer & AI Engineer",
@@ -825,9 +823,7 @@ const BOT_DATA = {
   });
 })();
 
-// ===== Chatbot script end =====
 
-// ===== Pass 1: Glass pointer and ambient lifecycle start =====
 (() => {
   const backdrop = document.getElementById("ambientBackdrop");
   let backdropIsVisible = false;
@@ -961,9 +957,7 @@ const BOT_DATA = {
     { passive: true },
   );
 })();
-// ===== Pass 1: Glass pointer and ambient lifecycle end =====
 
-// ===== Pass 3: Scroll progress, stats, and contact interactions start =====
 (() => {
   document.querySelectorAll(".proj-card").forEach((card) => {
     card.classList.add("qpass3-tilt");
@@ -1059,4 +1053,3 @@ const BOT_DATA = {
     showToast(`Copy didn't work. You can email me at ${email}.`);
   });
 })();
-// ===== Pass 3: Scroll progress, stats, and contact interactions end =====

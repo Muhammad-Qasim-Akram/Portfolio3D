@@ -423,7 +423,6 @@ nav.blur {
   }
 }
 
-/* ─── PHOTO FLIP CARD ─── */
 .hero-photo-wrap {
   width: clamp(230px, 24vw, 380px);
   position: relative;
@@ -460,7 +459,6 @@ nav.blur {
   object-position: center 8%;
   display: block;
 }
-/* red back */
 .flip-back {
   background: #c0392b;
   transform: rotateY(180deg);
@@ -1029,6 +1027,7 @@ nav.blur {
   overflow: hidden;
   background: #1a1a1a;
   position: relative;
+  border-radius: 12px;
 }
 .proj-img-inner {
   width: 100%;
@@ -1133,7 +1132,6 @@ nav.blur {
   transform: translate(2px, -2px);
 }
 
-/* ─── TESTIMONIALS ─── */
 .testi-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -1271,6 +1269,35 @@ nav.blur {
   font-size: 0.82rem;
   font-weight: 500;
   transition: all 0.2s;
+}
+.c-email-row {
+  justify-content: flex-start;
+  gap: 10px;
+}
+.c-email-address {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.c-email-row .c-email-copy {
+  width: auto;
+  flex: 0 0 auto;
+  padding: 5px 8px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  font: inherit;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  cursor: pointer;
+}
+.c-email-copy:hover {
+  background: rgba(255, 255, 255, 0.16);
 }
 .c-link:hover {
   background: rgba(255, 255, 255, 0.06);
@@ -1471,7 +1498,6 @@ footer {
   transition-delay: 0.25s;
 }
 
-/* ─── RESPONSIVE ─── */
 @media (max-width: 1000px) {
   #hero {
     grid-template-columns: 1fr;
@@ -1620,7 +1646,6 @@ footer {
   }
 }
 
-/* ── PROJECT IMAGE UPGRADES ── */
 .proj-thumb {
   position: relative;
   overflow: hidden;
@@ -1766,7 +1791,6 @@ footer {
   color: #c0392b;
 }
 
-/* ===== Chatbot start ===== */
 .qbot-widget {
   position: fixed;
   right: 24px;
@@ -2109,9 +2133,7 @@ footer {
     transition: none !important;
   }
 }
-/* ===== Chatbot end ===== */
 
-/* ===== Pass 1: Liquid glass foundation start ===== */
 body {
   isolation: isolate;
   background: transparent;
@@ -2262,9 +2284,7 @@ html {
     --glass-blur: 12px;
   }
 }
-/* ===== Pass 1: Liquid glass foundation end ===== */
 
-/* ===== Pass 2: Loader, navigation, and hero start ===== */
 .loader-progress {
   position: absolute;
   right: clamp(24px, 5vw, 64px);
@@ -2413,9 +2433,7 @@ body.qpass2-ready .scroll-hint {
     cursor: pointer;
   }
 }
-/* ===== Pass 2: Loader, navigation, and hero end ===== */
 
-/* ===== Pass 3: Scroll, interaction, and warm gradients start ===== */
 :root {
   --qpass3-warm-gradient: linear-gradient(115deg, #f0c5b3 0%, #d56b53 48%, #c0392b 100%);
   --qpass3-rim-gradient: linear-gradient(
@@ -2651,7 +2669,6 @@ body.qpass2-ready .scroll-hint {
   }
 }
 
-/* ===== Pass 6: Tech stack, footer glass, and ambient depth ===== */
 .stack-grid.glass {
   gap: 8px;
   padding: 9px;
@@ -2859,7 +2876,6 @@ footer.glass .back-top:hover {
     animation: none !important;
   }
 }
-/* ===== Pass 6: Tech stack, footer glass, and ambient depth end ===== */
 
 .current-project {
   position: relative;
@@ -3070,9 +3086,7 @@ footer.glass .back-top:hover {
     transform: none;
   }
 }
-/* ===== Pass 3: Scroll, interaction, and warm gradients end ===== */
 
-/* ===== Pass 5: Mobile and hover performance tuning start ===== */
 @media (max-width: 640px) {
   .ambient-blob {
     animation: none;
@@ -3143,9 +3157,7 @@ footer.glass .back-top:hover {
     transform: none;
   }
 }
-/* ===== Pass 5: Mobile and hover performance tuning end ===== */
 
-/* ===== Pass 4: Ask Qasim liquid-glass assistant start ===== */
 .qbot-panel.glass {
   border: 1px solid rgba(255, 255, 255, 0.68);
   background:
@@ -3414,9 +3426,7 @@ footer.glass .back-top:hover {
     transform: none;
   }
 }
-/* ===== Pass 4: Ask Qasim liquid-glass assistant end ===== */
 
-/* ===== Pass 5: Small-screen glass blur tuning ===== */
 @media (max-width: 640px) {
   .qbot-panel.glass {
     -webkit-backdrop-filter: blur(14px) saturate(145%);
@@ -3427,9 +3437,7 @@ footer.glass .back-top:hover {
     backdrop-filter: blur(8px) saturate(135%);
   }
 }
-/* ===== Pass 5: Small-screen glass blur tuning end ===== */
 
-/* Keep one slow ambient gradient moving on mobile without re-enabling all blobs. */
 @media (max-width: 640px) {
   .ambient-blob-one {
     animation: ambient-drift 72s ease-in-out infinite alternate;
@@ -3441,7 +3449,6 @@ footer.glass .back-top:hover {
   }
 }
 
-/* Shared button motion: match the hero CTA without changing button styling. */
 button:not(:disabled),
 .btn-primary,
 .btn-outline,
