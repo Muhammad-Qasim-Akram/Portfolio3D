@@ -1,84 +1,79 @@
 # Qasim Akram — Portfolio
 
-Personal portfolio website of **Muhammad Qasim Akram**, Full Stack Developer & AI Engineer.
+Personal portfolio of **Muhammad Qasim Akram**, a Full Stack Developer and AI Engineer based in Pakistan.
 
-🌐 **Live:** [qasim-akram.netlify.app](https://qasim-akram.netlify.app)
+**Live site:** [qasim-akram.netlify.app](https://qasim-akram.netlify.app)
 
----
+![Portfolio homepage](img/portfolio-homepage.png)
 
 ## About
 
-A single-file, self-contained portfolio built for performance and personality. No frameworks, no build tools — pure HTML, CSS, and vanilla JavaScript. Designed to show who I am, what I've built, and how I think.
-
----
+This static portfolio presents my background, selected projects, technical skills, services, and contact information. It is built with plain HTML, CSS, and vanilla JavaScript, with no build step or front-end framework.
 
 ## Features
 
-- **Text scramble effect** — hacker-style character scramble on hero text and scroll-reveal sections
-- **Flip card** — photo card that flips on scroll to reveal links
-- **macOS-style custom cursor** — replaces the default cursor on desktop
-- **Scroll-reveal animations** — elements animate in as they enter the viewport
-- **Loader screen** — branded intro animation on every page load
-- **Mobile nav overlay** — full-screen menu for small screens
-- **Base64 embedded assets** — single HTML file with no external asset dependencies
-- **LiveCharts2-style badges** — pill-shaped tech stack tags
+- Responsive layout with a mobile navigation menu
+- Animated hero, scroll reveals, and a flip card with profile and social links
+- Glass-inspired surfaces and subtle hover and magnetic button interactions
+- Project cards, technical skills, and service listings
+- Contact form powered by EmailJS
+- Built-in portfolio chatbot with preset, local replies and quick commands; it does not connect to an AI model or backend
+- Reduced-motion support
+- Resume, favicon, and social sharing image in the `img/` folder
 
----
+## Selected projects
 
-## Projects Featured
+| Project | Description | Technologies |
+| --- | --- | --- |
+| [ChatRoom](https://chat-room-two-pi.vercel.app/) | Real-time chat rooms with instant messages | React, Django Channels, WebSockets, Redis |
+| DevChat | LLM-powered developer assistant with context memory and streaming | React, Node.js, LLaMA 3 |
+| EyeSpy | Real-time object detection with audio feedback | Python, OpenCV, YOLOv8 |
+| YOUROWN | E-commerce storefront with cart, authentication, and order tracking | React, Node.js, MongoDB, Azure |
+| Minimal Analysis | Stock analysis using live market data and an LLM | Express.js, Groq, LLaMA |
+| [SmartSpend API](https://github.com/Muhammad-Qasim-Akram/Smartspend.Api) | Expense-tracking backend currently in development | ASP.NET, PostgreSQL |
 
-| # | Project | Stack | Links |
-|---|---------|-------|-------|
-| 001 | **ChatRoom** — Real-time chat app | Django Channels · WebSockets · Redis · React | Live · GitHub |
-| 002 | **DevChat** — AI developer assistant | React · Node.js · LLaMA 3 · Groq | Live · GitHub |
-| 003 | **EyeSpy** — Blind assistance system | YOLOv8 · OpenCV · Python · Windows Speech API | GitHub |
-| 004 | **yourOwn Store** — E-commerce platform | React · Node.js · Azure · MongoDB | Live · GitHub |
-| 005 | **Minimal Analysis** — AI stock predictor | Express.js · Groq · LLaMA · JS | GitHub |
+## Tech stack
 
----
+- **Frontend:** React.js, JavaScript, TypeScript, HTML5, CSS3, Tailwind CSS
+- **Backend:** ASP.NET, Node.js, Django, Express, REST APIs, WebSockets
+- **Databases:** PostgreSQL, MongoDB, MySQL, Redis
+- **AI and computer vision:** Python, YOLOv8, OpenCV, Groq / LLMs, scikit-learn
+- **DevOps:** Git, GitHub, Azure, Vercel, Netlify, GitHub Actions
 
-## Tech Stack
+## Run locally
 
-**Frontend** — React · Vite · HTML · CSS · JavaScript  
-**Backend** — Django · Node.js · Express.js  
-**AI / ML** — YOLOv8 · OpenCV · LLaMA 3 · Groq API  
-**Databases** — PostgreSQL · MongoDB · SQLite · SQL Server  
-**DevOps** — Netlify · Vercel · Railway · Azure · GitHub Actions  
-**Other** — WebSockets · Redis · JWT · REST APIs
-
----
-
-## Local Development
-
-No build step needed. Just open the file:
+No install or build command is required. Clone the repository and open `index.html` in a browser:
 
 ```bash
-git clone https://github.com/Muhammad-Qasim-Akram/portfolio
-cd portfolio
-open index.html
+git clone https://github.com/Muhammad-Qasim-Akram/Portfolio3D.git
+cd Portfolio3D
 ```
 
-Or drag `index.html` into any browser.
+The contact form uses EmailJS, so its submission requires a network connection and valid EmailJS configuration. The chatbot works locally using predefined content and commands.
 
----
+## Project structure
 
-## Structure
-
+```text
+Portfolio3D/
+├── index.html
+├── style.css
+├── script.js
+├── readme.md
+├── sitemap.xml
+├── robots.txt
+└── img/
+    ├── favicon.svg
+    ├── og-image.png
+    ├── portfolio-homepage.png
+    └── Muhammad_Qasim_Akram_Resume.pdf
 ```
-portfolio/
-└── index.html        # Everything — HTML, CSS, JS, assets (base64 embedded)
-```
-
----
 
 ## Contact
 
-- **Email:** qasimakram46@hotmail.com
-- **GitHub:** [github.com/Qasim-Akram](https://github.com/Muhammad-Qasim-Akram)
-- **LinkedIn:** [linkedin.com/in/qasimakram](https://linkedin.com/in/qasimakram)
-
----
+- **Email:** [qasimakram46@hotmail.com](mailto:qasimakram46@hotmail.com)
+- **GitHub:** [Muhammad-Qasim-Akram](https://github.com/Muhammad-Qasim-Akram)
+- **LinkedIn:** [qasimakram](https://linkedin.com/in/qasimakram)
 
 ## License
 
-MIT — feel free to take inspiration, but don't copy it wholesale.
+MIT — feel free to take inspiration, but please do not copy the portfolio wholesale.
