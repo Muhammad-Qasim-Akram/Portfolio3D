@@ -1,21 +1,38 @@
 //PAGE LOADER
 const loader = document.getElementById("loader");
+let loaderStarted = false;
+
+function finishPageLoader() {
+  const heroName = document.querySelector(".hero-hey .word-name");
+  const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduceMotion && heroName) scrambleText(heroName, heroName.textContent, 500);
+  document.body.classList.add("qpass2-ready");
+  loader.remove();
+}
+
+function startPageLoaderExit() {
+  if (loaderStarted || !loader) return;
+  loaderStarted = true;
+  const handleLoaderExit = (event) => {
+    if (event.target !== loader || event.animationName !== "loaderOut") return;
+    loader.removeEventListener("animationend", handleLoaderExit);
+    finishPageLoader();
+  };
+  loader.addEventListener(
+    "animationend",
+    handleLoaderExit,
+  );
+  loader.classList.add("out");
+}
+
 window.addEventListener("load", () => {
-  setTimeout(() => {
-    loader.classList.add("out");
-    setTimeout(() => loader.remove(), 1600);
-  }, 900);
-});
+  window.setTimeout(startPageLoaderExit, 900);
+}, { once: true });
+if (document.readyState === "complete") {
+  window.setTimeout(startPageLoaderExit, 900);
+}
 
 const cur = document.getElementById("cur");
-let cx = -200,
-  cy = -200;
-document.addEventListener("mousemove", (e) => {
-  cx = e.clientX;
-  cy = e.clientY;
-  cur.style.left = cx + "px";
-  cur.style.top = cy + "px";
-});
 document
   .querySelectorAll("a,button,.proj-card,.svc-row,.sk,.stat,.c-link")
   .forEach((el) => {
@@ -31,49 +48,98 @@ if ("ontouchstart" in window) cur.style.display = "none";
 window.addEventListener(
   "scroll",
   () => {
+    const scrolled = window.scrollY > 50;
     document
       .getElementById("navbar")
-      .classList.toggle("blur", window.scrollY > 50);
+      .classList.toggle("blur", scrolled);
+    document.getElementById("navbar").classList.toggle("scrolled", scrolled);
   },
   { passive: true },
 );
 
 const navHam = document.getElementById("navHam");
 const mobileMenu = document.getElementById("mobileMenu");
+
+function closeMobileMenu() {
+  mobileMenu.classList.remove("open");
+  mobileMenu.setAttribute("aria-hidden", "true");
+  mobileMenu.inert = true;
+  navHam.setAttribute("aria-expanded", "false");
+  navHam.setAttribute("aria-label", "Open menu");
+  navHam.innerHTML = "&#9776;";
+}
+
 navHam.addEventListener("click", (e) => {
   e.stopPropagation();
   const isOpen = mobileMenu.classList.toggle("open");
+  mobileMenu.setAttribute("aria-hidden", String(!isOpen));
+  mobileMenu.inert = !isOpen;
+  navHam.setAttribute("aria-expanded", String(isOpen));
+  navHam.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
   navHam.innerHTML = isOpen ? "&#10005;" : "&#9776;";
 });
 
 mobileMenu.querySelectorAll("a").forEach((a) => {
-  a.addEventListener("click", () => {
-    mobileMenu.classList.remove("open");
-    navHam.innerHTML = "&#9776;";
-  });
+  a.addEventListener("click", closeMobileMenu);
 });
 
 document.addEventListener("click", (e) => {
   if (!mobileMenu.contains(e.target) && e.target !== navHam) {
-    mobileMenu.classList.remove("open");
-    navHam.innerHTML = "&#9776;";
+    closeMobileMenu();
   }
 });
 
 const navAs = document.querySelectorAll(".nav-links a, .nav-mobile-menu a");
+const navSectionIds = new Set(
+  Array.from(navAs, (link) => link.getAttribute("href").slice(1)),
+);
+const navLinks = document.getElementById("navLinks");
+let activeNavHref = "";
+
+function updateNavIndicator() {
+  const activeLink = navLinks.querySelector("a.active");
+  if (!activeLink) {
+    navLinks.classList.remove("has-active");
+    activeNavHref = "";
+    return;
+  }
+  navLinks.classList.add("has-active");
+  if (activeLink.getAttribute("href") === activeNavHref) return;
+  activeNavHref = activeLink.getAttribute("href");
+  navLinks.style.setProperty("--indicator-x", `${activeLink.offsetLeft}px`);
+  navLinks.style.setProperty("--indicator-width", `${activeLink.offsetWidth}px`);
+}
+
+function updateActiveNavigation() {
+  let active = "";
+  document.querySelectorAll("section[id], .section[id]").forEach((section) => {
+    if (
+      navSectionIds.has(section.id) &&
+      window.scrollY >= section.offsetTop - 240
+    ) {
+      active = section.id;
+    }
+  });
+  navAs.forEach((link) =>
+    link.classList.toggle("active", link.getAttribute("href") === `#${active}`),
+  );
+  updateNavIndicator();
+}
+
 window.addEventListener(
   "scroll",
+  updateActiveNavigation,
+  { passive: true },
+);
+window.addEventListener(
+  "resize",
   () => {
-    let active = "";
-    document.querySelectorAll("section[id], div[id]").forEach((s) => {
-      if (window.scrollY >= s.offsetTop - 240) active = s.id;
-    });
-    navAs.forEach((a) =>
-      a.classList.toggle("active", a.getAttribute("href") === "#" + active),
-    );
+    activeNavHref = "";
+    updateNavIndicator();
   },
   { passive: true },
 );
+updateActiveNavigation();
 
 const io = new IntersectionObserver(
   (entries) => {
@@ -309,44 +375,9 @@ function scrambleTextWithBR(el, duration = 800) {
   }, frameDuration);
 }
 
-const SKIP_TAGS = new Set([
-  'IMG','SVG','svg','I','INPUT','TEXTAREA','SCRIPT',
-  'STYLE','CANVAS','VIDEO','AUDIO','PICTURE','FIGURE','HR'
-]);
-
-function isLeaf(el) {
-  return el.children.length === 0 && el.textContent.trim().length > 0;
-}
-
-function isBRLeaf(el) {
-  if (el.children.length === 0) return false;
-  return [...el.children].every(c => c.tagName === 'BR') && el.textContent.trim().length > 0;
-}
-
-function collectSafeLeaves(root) {
-  const results = [];
-  function walk(node) {
-    if (!node || SKIP_TAGS.has(node.tagName)) return;
-    if (isLeaf(node) || isBRLeaf(node)) {
-      results.push(node);
-    } else {
-      for (const child of node.children) walk(child);
-    }
-  }
-  walk(root);
-  return results;
-}
-
-function scrambleEl(el, duration) {
-  if (isBRLeaf(el)) {
-    scrambleTextWithBR(el, duration);
-  } else {
-    scrambleText(el, el.textContent, duration);
-  }
-}
-
 (function () {
-  document.querySelectorAll('.loader-word').forEach((el) => {
+  document.querySelectorAll('.loader-word, .loader-progress').forEach((el) => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     if (el.textContent.toLowerCase().includes('full stack') || el.textContent.toLowerCase().includes('ai engineer')) return;
     const originalHTML = el.innerHTML;
     const hasBreak = el.querySelector('br');
@@ -368,100 +399,19 @@ function scrambleEl(el, duration) {
 })();
 
 (function () {
-  const seen = new WeakSet();
-
-  function go(el, delay, dur) {
-    if (!el || seen.has(el)) return;
-    if (!isLeaf(el) && !isBRLeaf(el)) return;
-    seen.add(el);
-    setTimeout(() => scrambleEl(el, dur || 750), delay);
-  }
-
-  function runHeroScramble() {
-    document.querySelectorAll('.hero-hey .word').forEach((el, i) => {
-      go(el, 200 + i * 150);
-    });
-
-    go(document.querySelector('.hero-tagline'), 500);
-    go(document.querySelector('.scroll-hint span:last-child'), 700);
-
-    const bio = document.querySelector('.hero-bio');
-    if (bio) {
-      collectSafeLeaves(bio).forEach((el, i) => {
-        go(el, 600 + i * 100);
-      });
-    }
-
-    document.querySelectorAll('.hero-cta a').forEach((el, i) => {
-      go(el, 800 + i * 120);
-    });
-
-    document.querySelectorAll('#navLinks a, .nav-mobile-menu a').forEach((el, i) => {
-      go(el, 100 + i * 80, 500);
-    });
-
-    go(document.querySelector('.btn-nav'), 300, 500);
-    go(document.querySelector('.nav-name'), 50, 500);
-  }
-
-  // Run immediately — no waiting for load event.
-  // Wrapped in a short timeout so the DOM is painted first.
-  setTimeout(runHeroScramble, 2600);
-})();
-
-(function () {
-  const SECTION_SELECTORS = [
-    '#stack',    '.stack',
-    '#projects', '.projects',
-    '#services', '.services',
-    '#about',    '.about',
-    '#contact',  '.contact',
-  ].join(',');
-
-  const seen = new WeakSet();
-
-  const scrambleIO = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((e) => {
-        if (!e.isIntersecting) return;
-        const el = e.target;
-        if ((isLeaf(el) || isBRLeaf(el))) {
-          scrambleEl(el, 800);
-        } else {
-          collectSafeLeaves(el).forEach((child, idx) => {
-            if (seen.has(child)) return;
-            seen.add(child);
-            setTimeout(() => scrambleEl(child, 780), idx * 55);
-          });
-        }
-        scrambleIO.unobserve(el);
-      });
-    },
-    { threshold: 0.08, rootMargin: '0px 0px -15px 0px' }
-  );
-
-  document.querySelectorAll(SECTION_SELECTORS).forEach((section) => {
-    if (!seen.has(section)) {
-      scrambleIO.observe(section);
-      seen.add(section);
-    }
-    collectSafeLeaves(section).forEach((el) => {
-      if (!seen.has(el)) {
-        scrambleIO.observe(el);
-        seen.add(el);
-      }
-    });
-  });
-
-  document.querySelectorAll(
-    '.sr h1,.sr h2,.sr h3,.sr h4,.sr h5,.sr h6,.sr p,.sr span,.sr a,.sr li,' +
-    '.sr-l h1,.sr-l h2,.sr-l h3,.sr-l h4,.sr-l p,.sr-l span,.sr-l a,' +
-    '.sr-r h1,.sr-r h2,.sr-r h3,.sr-r h4,.sr-r p,.sr-r span,.sr-r a'
-  ).forEach((el) => {
-    if (!seen.has(el) && (isLeaf(el) || isBRLeaf(el))) {
-      scrambleIO.observe(el);
-      seen.add(el);
-    }
+  const tagline = document.querySelector(".hero-tagline");
+  const text = tagline.textContent.trim().split(/\s+/);
+  tagline.replaceChildren();
+  text.forEach((word, index) => {
+    if (index) tagline.append(document.createTextNode(" "));
+    const mask = document.createElement("span");
+    mask.className = "hero-tagline-word-mask";
+    const wordSpan = document.createElement("span");
+    wordSpan.className = "hero-tagline-word";
+    wordSpan.style.setProperty("--hero-word-delay", `${index * 42}ms`);
+    wordSpan.textContent = word;
+    mask.append(wordSpan);
+    tagline.append(mask);
   });
 })();
 
@@ -469,7 +419,7 @@ function scrambleEl(el, duration) {
 const BOT_DATA = {
   name: "Muhammad Qasim Akram",
   role: "Full Stack Developer & AI Engineer",
-  intro: "Hey, I'm Qasim — a full stack developer and AI engineer from Pakistan. I build useful products across React frontends, ASP.NET, Node.js and Django backends, and AI systems. I'm currently building SmartSpend, an expense-tracking app backend with ASP.NET and PostgreSQL.",
+  intro: "Hey, I'm Qasim, a full stack developer from Pakistan. I build useful products across React frontends, ASP.NET, Node.js and Django backends, computer vision, and language-model tools. I'm currently building SmartSpend, an expense-tracking app backend with ASP.NET and PostgreSQL.",
   stack: {
     frontend: ["React.js", "JavaScript", "TypeScript", "HTML", "CSS"],
     backend: ["ASP.NET", "Node.js", "Django", "Python", "REST APIs", "WebSockets", "PostgreSQL", "MongoDB", "Redis"],
@@ -488,8 +438,8 @@ const BOT_DATA = {
       link: "https://chat-room-two-pi.vercel.app/"
     },
     {
-      name: "DevChat — AI Chat Assistant",
-      description: "An LLM-powered developer assistant with context memory and streaming, using LLaMA 3 via Ollama.",
+      name: "DevChat — Developer Chat Assistant",
+      description: "A language-model developer assistant with context memory and streaming, using LLaMA 3 via Ollama.",
       link: "https://dev-chat-gilt.vercel.app/"
     },
     {
@@ -503,8 +453,8 @@ const BOT_DATA = {
       link: "https://qasim-ecommerce.azurewebsites.net/"
     },
     {
-      name: "Minimal Analysis — AI Stock Predictor",
-      description: "Stock analysis with live market data and AI-generated insights.",
+      name: "Minimal Analysis — Stock Predictor",
+      description: "Stock analysis with live market data and generated insights.",
       link: "https://github.com/Muhammad-Qasim-Akram/Stock-Price-Prediction"
     }
   ],
@@ -528,8 +478,8 @@ const BOT_DATA = {
   const suggestions = document.getElementById("qbot-suggestions");
   const form = document.getElementById("qbot-form");
   const input = document.getElementById("qbot-input");
-  const displayName = BOT_DATA.name.trim().split(/\s+/).slice(-2).join(" ");
-  document.getElementById("qbot-title").textContent = `${displayName}'s assistant`;
+  const botTitle = document.getElementById("qbot-title");
+  botTitle.textContent = "Ask Qasim";
   const commandNames = [
     "/help", "/intro", "/stack", "/projects", "/education",
     "/certs", "/contact", "/resume", "/hire", "/clear", "/coffee"
@@ -537,13 +487,18 @@ const BOT_DATA = {
   const quickCommands = ["/intro", "/stack", "/projects", "/contact"];
   const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
   let hasOpened = false;
+  let titleScrambled = false;
   let replyId = 0;
 
   function addMessage(kind, content) {
     const message = document.createElement("div");
     message.className = `qbot-message qbot-${kind}`;
     if (typeof content === "string") {
-      message.textContent = content;
+      if (kind === "bot" && !reduceMotion.matches) {
+        appendScrambledText(message, content);
+      } else {
+        message.textContent = content;
+      }
     } else {
       content.forEach((part) => {
         if (part.url) {
@@ -555,7 +510,11 @@ const BOT_DATA = {
           link.textContent = part.text;
           message.append(link);
         } else {
-          message.append(document.createTextNode(part.text));
+          if (kind === "bot" && !reduceMotion.matches) {
+            appendScrambledText(message, part.text);
+          } else {
+            message.append(document.createTextNode(part.text));
+          }
         }
       });
     }
@@ -564,6 +523,61 @@ const BOT_DATA = {
     return message;
   }
 
+  function appendScrambledText(parent, text) {
+    const tokens = text.match(/\s+|[^\s]+/g) || [];
+    const wordSpans = [];
+    const visualText = document.createElement("span");
+    visualText.className = "qbot-scramble-visual";
+    visualText.setAttribute("aria-hidden", "true");
+    tokens.forEach((token) => {
+      if (/^\s+$/.test(token)) {
+        visualText.append(document.createTextNode(token));
+        return;
+      }
+      const word = document.createElement("span");
+      word.className = "qbot-scramble-word";
+      word.dataset.finalText = token;
+      word.textContent = token.replace(/[^\s]/g, () =>
+        CHARS[Math.floor(Math.random() * CHARS.length)],
+      );
+      visualText.append(word);
+      wordSpans.push(word);
+    });
+    parent.append(visualText);
+    const accessibleText = document.createElement("span");
+    accessibleText.className = "qbot-sr-only";
+    accessibleText.textContent = text;
+    parent.append(accessibleText);
+
+    const interval = wordSpans.length
+      ? Math.min(500, Math.max(1, Math.floor(500 / wordSpans.length)))
+      : 0;
+    wordSpans.forEach((word, index) => {
+      window.setTimeout(() => {
+        word.textContent = word.dataset.finalText;
+      }, interval * index);
+    });
+  }
+
+  function scrambleBotTitle() {
+    if (reduceMotion.matches) return;
+    const finalText = botTitle.textContent;
+    let frame = 0;
+    const totalFrames = 10;
+    const timer = window.setInterval(() => {
+      const resolvedWords = Math.floor((frame / totalFrames) * 2);
+      botTitle.textContent = ["Ask", "Qasim"]
+        .map((word, index) => index < resolvedWords
+          ? word
+          : word.replace(/[^\s]/g, () => CHARS[Math.floor(Math.random() * CHARS.length)]))
+        .join(" ");
+      frame += 1;
+      if (frame > totalFrames) {
+        window.clearInterval(timer);
+        botTitle.textContent = finalText;
+      }
+    }, 50);
+  }
   function setChips(commands) {
     chips.replaceChildren();
     commands.forEach((command) => {
@@ -601,17 +615,17 @@ const BOT_DATA = {
     switch (command) {
       case "/help":
         return {
-          text: "Try /intro, /stack, /projects, /education, /certs, /contact, /resume, or /hire. You can also ask me in plain English.",
+          text: "I can tell you about my work, skills, projects, education, and contact details. Try /intro, /stack, /projects, /education, /certs, /contact, /resume, or /hire.",
           chips: quickCommands
         };
       case "/intro":
-        return { text: BOT_DATA.intro, typewriter: true, chips: quickCommands };
+        return { text: BOT_DATA.intro, chips: quickCommands };
       case "/stack":
         return {
           parts: [
             { text: "Here's what I work with:\nFrontend: " + BOT_DATA.stack.frontend.join(", ") +
               "\nBackend: " + BOT_DATA.stack.backend.join(", ") +
-              "\nAI: " + BOT_DATA.stack.ai.join(", ") +
+              "\nComputer vision & language tools: " + BOT_DATA.stack.ai.join(", ") +
               "\nTools: " + BOT_DATA.stack.tools.join(", ") }
           ],
           chips: ["/projects", "/intro", "/contact"]
@@ -619,7 +633,7 @@ const BOT_DATA = {
       case "/projects":
         return {
           parts: BOT_DATA.projects.flatMap((project, index) => [
-            { text: `${index ? "\n\n" : ""}${project.name}: ${project.description} ` },
+            { text: `${index ? "\n\n" : "Here are a few things I've built:\n"}${project.name}: ${project.description} ` },
             { text: "View project ↗", url: project.link }
           ]),
           chips: ["/stack", "/contact", "/hire"]
@@ -634,9 +648,9 @@ const BOT_DATA = {
       case "/contact":
         return {
           parts: [
-            { text: "You can reach me at " },
+            { text: "Email me at " },
             { text: BOT_DATA.contact.email, url: `mailto:${BOT_DATA.contact.email}` },
-            { text: ", or find me on " },
+            { text: ", or find my work on " },
             { text: "GitHub", url: BOT_DATA.contact.github },
             { text: " and " },
             { text: "LinkedIn", url: BOT_DATA.contact.linkedin },
@@ -680,7 +694,7 @@ const BOT_DATA = {
       messages.replaceChildren();
       setChips(quickCommands);
       showBotReply({
-        text: "All cleared. What would you like to know?",
+        text: "I cleared the chat. What would you like to know?",
         chips: quickCommands
       });
       return;
@@ -713,21 +727,7 @@ const BOT_DATA = {
       typing.remove();
       const content = reply.parts || reply.text;
       const message = addMessage("bot", content);
-      if (reply.typewriter && !reduceMotion.matches) {
-        const fullText = reply.text;
-        message.textContent = "";
-        let index = 0;
-        const step = () => {
-          if (currentReply !== replyId) return;
-          message.textContent = fullText.slice(0, index++);
-          messages.scrollTop = messages.scrollHeight;
-          if (index <= fullText.length) window.setTimeout(step, 16);
-          else setChips(reply.chips);
-        };
-        step();
-      } else {
-        setChips(reply.chips);
-      }
+      setChips(reply.chips);
     }, delay);
   }
 
@@ -769,11 +769,15 @@ const BOT_DATA = {
     launcher.classList.add("qbot-clicked");
     window.requestAnimationFrame(() => panel.classList.add("qbot-open"));
     window.setTimeout(() => input.focus(), reduceMotion.matches ? 0 : 180);
+    if (!titleScrambled) {
+      titleScrambled = true;
+      scrambleBotTitle();
+    }
     if (!hasOpened) {
       hasOpened = true;
       setChips(quickCommands);
       showBotReply({
-        text: `Hey! I'm here to tell you about ${displayName}'s work, skills, and how to get in touch.`,
+        text: "Hey, I'm Qasim. Ask me about my work, projects, or how to get in touch.",
         chips: quickCommands
       });
     }
@@ -816,6 +820,10 @@ const BOT_DATA = {
   let backdropIsVisible = false;
   let pointerFrame = 0;
   let pointerTarget = null;
+  let magneticTarget = null;
+  let tiltTarget = null;
+  let previousMagneticTarget = null;
+  let previousTiltTarget = null;
   let pointerX = 0;
   let pointerY = 0;
 
@@ -841,24 +849,201 @@ const BOT_DATA = {
     document.addEventListener(
       "pointermove",
       (event) => {
-        pointerTarget =
-          event.target instanceof Element ? event.target.closest(".glass") : null;
+        const target =
+          event.target instanceof Element
+            ? event.target.closest(".glass, .qbot-launcher")
+            : null;
+        magneticTarget =
+          event.target instanceof Element ? event.target.closest(".magnetic") : null;
+        tiltTarget =
+          event.target instanceof Element ? event.target.closest(".proj-card") : null;
+        if (previousMagneticTarget && previousMagneticTarget !== magneticTarget) {
+          previousMagneticTarget.style.setProperty("--mag-x", "0px");
+          previousMagneticTarget.style.setProperty("--mag-y", "0px");
+        }
+        if (previousTiltTarget && previousTiltTarget !== tiltTarget) {
+          previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
+          previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
+        }
+        previousMagneticTarget = magneticTarget;
+        previousTiltTarget = tiltTarget;
+        pointerTarget = target;
         pointerX = event.clientX;
         pointerY = event.clientY;
-        if (!pointerTarget || pointerFrame) return;
+        if (pointerFrame) return;
 
         pointerFrame = window.requestAnimationFrame(() => {
           pointerFrame = 0;
-          if (!pointerTarget || !pointerTarget.isConnected) return;
-          const bounds = pointerTarget.getBoundingClientRect();
-          const x = ((pointerX - bounds.left) / bounds.width) * 100;
-          const y = ((pointerY - bounds.top) / bounds.height) * 100;
-          pointerTarget.style.setProperty("--mx", `${x}%`);
-          pointerTarget.style.setProperty("--my", `${y}%`);
+          cur.style.setProperty("--cursor-x", `${pointerX}px`);
+          cur.style.setProperty("--cursor-y", `${pointerY}px`);
+          if (pointerTarget && pointerTarget.isConnected) {
+            const bounds = pointerTarget.getBoundingClientRect();
+            const x = bounds.width ? ((pointerX - bounds.left) / bounds.width) * 100 : 50;
+            const y = bounds.height ? ((pointerY - bounds.top) / bounds.height) * 100 : 50;
+            pointerTarget.style.setProperty("--mx", `${x}%`);
+            pointerTarget.style.setProperty("--my", `${y}%`);
+          }
+          if (magneticTarget && magneticTarget.isConnected) {
+            const bounds = magneticTarget.getBoundingClientRect();
+            const x = Math.max(-8, Math.min(8, (pointerX - bounds.left - bounds.width / 2) * 0.12));
+            const y = Math.max(-8, Math.min(8, (pointerY - bounds.top - bounds.height / 2) * 0.12));
+            magneticTarget.style.setProperty("--mag-x", `${x}px`);
+            magneticTarget.style.setProperty("--mag-y", `${y}px`);
+          }
+          if (tiltTarget && tiltTarget.isConnected) {
+            const bounds = tiltTarget.getBoundingClientRect();
+            const horizontal = (pointerX - bounds.left) / bounds.width - 0.5;
+            const vertical = (pointerY - bounds.top) / bounds.height - 0.5;
+            const rotateX = Math.max(-5, Math.min(5, -vertical * 10));
+            const rotateY = Math.max(-5, Math.min(5, horizontal * 10));
+            tiltTarget.style.setProperty("--qpass3-tilt-x", `${rotateY}deg`);
+            tiltTarget.style.setProperty("--qpass3-tilt-y", `${rotateX}deg`);
+          }
+          if (backdropIsVisible) {
+            const parallaxX = ((pointerX / window.innerWidth) - 0.5) * 16;
+            const parallaxY = ((pointerY / window.innerHeight) - 0.5) * 12;
+            backdrop.style.setProperty("--parallax-x", `${parallaxX}px`);
+            backdrop.style.setProperty("--parallax-y", `${parallaxY}px`);
+          }
         });
+      },
+      { passive: true },
+    );
+    document.addEventListener(
+      "pointerout",
+      (event) => {
+        if (!event.relatedTarget && previousMagneticTarget) {
+          previousMagneticTarget.style.setProperty("--mag-x", "0px");
+          previousMagneticTarget.style.setProperty("--mag-y", "0px");
+          previousMagneticTarget = null;
+          magneticTarget = null;
+        }
+        if (!event.relatedTarget && previousTiltTarget) {
+          previousTiltTarget.style.setProperty("--qpass3-tilt-x", "0deg");
+          previousTiltTarget.style.setProperty("--qpass3-tilt-y", "0deg");
+          previousTiltTarget = null;
+          tiltTarget = null;
+        }
       },
       { passive: true },
     );
   }
 })();
 // ===== Pass 1: Glass pointer and ambient lifecycle end =====
+
+// ===== Pass 3: Scroll progress, stats, and contact interactions start =====
+(() => {
+  document.querySelectorAll(".proj-card").forEach((card) => {
+    card.classList.add("qpass3-tilt");
+  });
+
+  const progress = document.getElementById("qpass3-scroll-progress");
+  let progressFrame = 0;
+
+  function updateProgress() {
+    progressFrame = 0;
+    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
+    const amount = scrollable > 0 ? window.scrollY / scrollable : 0;
+    progress.style.transform = `scaleX(${Math.max(0, Math.min(1, amount))})`;
+  }
+
+  function scheduleProgressUpdate() {
+    if (progressFrame) return;
+    progressFrame = window.requestAnimationFrame(updateProgress);
+  }
+
+  window.addEventListener("scroll", scheduleProgressUpdate, { passive: true });
+  window.addEventListener("resize", scheduleProgressUpdate, { passive: true });
+  updateProgress();
+
+  const stats = document.querySelector(".stats");
+  const statNumbers = stats ? Array.from(stats.querySelectorAll(".sn")) : [];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const statsObserver = new IntersectionObserver(
+    ([entry]) => {
+      if (!entry.isIntersecting) return;
+      statsObserver.unobserve(entry.target);
+      const counters = statNumbers.map((element) => {
+        const [, number, suffix] = element.textContent.trim().match(/^(\d+)(.*)$/);
+        return { element, target: Number(number), suffix };
+      });
+      if (reducedMotion.matches) {
+        counters.forEach(({ element, target, suffix }) => {
+          element.textContent = `${target}${suffix}`;
+        });
+        return;
+      }
+
+      const startedAt = performance.now();
+      function animateCounters(now) {
+        const progressAmount = Math.min(1, (now - startedAt) / 900);
+        const eased = 1 - Math.pow(1 - progressAmount, 3);
+        counters.forEach(({ element, target, suffix }) => {
+          element.textContent = `${Math.round(target * eased)}${suffix}`;
+        });
+        if (progressAmount < 1) window.requestAnimationFrame(animateCounters);
+      }
+      window.requestAnimationFrame(animateCounters);
+    },
+    { threshold: 0.35 },
+  );
+  if (stats) statsObserver.observe(stats);
+
+  const copyButton = document.getElementById("qpass3-copy-email");
+  const toast = document.getElementById("qpass3-toast");
+  const email = "qasimakram46@hotmail.com";
+  let toastTimeout = 0;
+
+  function showToast(message) {
+    toast.textContent = message;
+    toast.classList.add("visible");
+    window.clearTimeout(toastTimeout);
+    toastTimeout = window.setTimeout(() => toast.classList.remove("visible"), 2400);
+  }
+
+  function legacyCopy(text) {
+    const field = document.createElement("textarea");
+    field.value = text;
+    field.setAttribute("readonly", "");
+    field.style.position = "fixed";
+    field.style.opacity = "0";
+    document.body.append(field);
+    try {
+      field.select();
+      return typeof document.execCommand === "function" &&
+        document.execCommand("copy");
+    } finally {
+      field.remove();
+    }
+  }
+
+  copyButton.addEventListener("click", async () => {
+    let copied = false;
+    let copyError = null;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(email);
+        copied = true;
+      } catch (error) {
+        copyError = error;
+      }
+    }
+    if (!copied) {
+      try {
+        copied = legacyCopy(email);
+        if (!copied && !copyError) {
+          copyError = new Error("The browser could not copy text to the clipboard.");
+        }
+      } catch (error) {
+        copyError = error;
+      }
+    }
+    if (copied) {
+      showToast("Email address copied.");
+      return;
+    }
+    console.error("Could not copy the contact email address.", copyError);
+    showToast(`Copy didn't work. You can email me at ${email}.`);
+  });
+})();
+// ===== Pass 3: Scroll progress, stats, and contact interactions end =====

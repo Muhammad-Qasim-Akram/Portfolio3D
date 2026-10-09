@@ -2450,3 +2450,594 @@ body.qpass2-ready .scroll-hint {
   }
 }
 /* ===== Pass 2: Loader, navigation, and hero end ===== */
+
+/* ===== Pass 3: Scroll, interaction, and warm gradients start ===== */
+:root {
+  --qpass3-warm-gradient: linear-gradient(115deg, #f0c5b3 0%, #d56b53 48%, #c0392b 100%);
+  --qpass3-rim-gradient: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.82),
+    rgba(192, 57, 43, 0.28) 52%,
+    rgba(213, 181, 155, 0.76)
+  );
+}
+
+.ambient-blob-one {
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(192, 57, 43, 0.8),
+    rgba(213, 181, 155, 0.58) 46%,
+    transparent 74%
+  );
+}
+.ambient-blob-two {
+  background: radial-gradient(
+    circle at 55% 45%,
+    rgba(192, 57, 43, 0.5),
+    rgba(17, 17, 17, 0.5) 48%,
+    transparent 76%
+  );
+}
+.ambient-blob-three {
+  background: radial-gradient(
+    circle at 48% 42%,
+    rgba(213, 181, 155, 0.8),
+    rgba(242, 237, 232, 0.68) 50%,
+    transparent 78%
+  );
+}
+
+.qpass3-scroll-progress {
+  position: fixed;
+  z-index: 1200;
+  inset: 0 0 auto;
+  height: 3px;
+  overflow: hidden;
+  pointer-events: none;
+}
+.qpass3-scroll-progress span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--qpass3-warm-gradient);
+  transform: scaleX(0);
+  transform-origin: left center;
+}
+
+.sr,
+.sr-l,
+.sr-r {
+  opacity: 0;
+  transform: translateY(24px);
+  transition:
+    opacity var(--duration-reveal) var(--ease-out),
+    transform var(--duration-reveal) var(--ease-out);
+}
+.sr.in,
+.sr-l.in,
+.sr-r.in {
+  opacity: 1;
+  transform: none;
+}
+
+.qpass3-heading-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+}
+.qpass3-heading-mask > span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(110%);
+  transition:
+    opacity var(--duration-reveal) var(--ease-out),
+    transform var(--duration-reveal) var(--ease-out);
+}
+.in .qpass3-heading-mask > span {
+  opacity: 1;
+  transform: translateY(0);
+}
+.red-tag {
+  background: var(--qpass3-warm-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.contact-h em .qpass3-heading-mask > span {
+  background: var(--qpass3-warm-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.current-project {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(112deg, #111 0%, #211716 65%, #38201c 100%);
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.current-project::before {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(46%, 400px);
+  background: radial-gradient(
+    ellipse at 80% 20%,
+    rgba(213, 107, 83, 0.38),
+    rgba(192, 57, 43, 0.12) 42%,
+    transparent 76%
+  );
+  content: "";
+  opacity: 0.7;
+  pointer-events: none;
+  transition: opacity var(--duration-hover) ease;
+}
+.current-project:hover {
+  transform: translateY(-3px);
+}
+.current-project:hover::before {
+  opacity: 1;
+}
+.current-project-copy,
+.current-project-link {
+  position: relative;
+  z-index: 1;
+}
+.current-project-link {
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.current-project-link:hover {
+  transform: translateY(-2px);
+}
+
+.proj-card.glass {
+  border: 1px solid transparent;
+  background:
+    linear-gradient(rgba(235, 230, 223, 0.96), rgba(235, 230, 223, 0.96)) padding-box,
+    var(--qpass3-rim-gradient) border-box;
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.proj-card.qpass3-tilt {
+  transform:
+    perspective(900px)
+    rotateX(var(--qpass3-tilt-y, 0deg))
+    rotateY(var(--qpass3-tilt-x, 0deg))
+    translateY(var(--qpass3-lift, 0px));
+  transform-style: preserve-3d;
+}
+.proj-card.qpass3-tilt:hover,
+.proj-card.qpass3-tilt:focus-visible {
+  --qpass3-lift: -4px;
+}
+.proj-card:focus-visible,
+.current-project-link:focus-visible,
+.qpass3-copy:focus-visible {
+  outline: 2px solid var(--red);
+  outline-offset: 4px;
+}
+
+.stat {
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.stat:hover {
+  transform: translateY(-2px);
+}
+.sk {
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.sk:hover {
+  transform: translateY(-3px);
+}
+.sk-tag,
+.svc-chip,
+.proj-tags span {
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.sk-tag:hover,
+.svc-chip:hover,
+.proj-tags span:hover {
+  transform: translateY(-2px);
+}
+.svc-row {
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.svc-row:hover {
+  transform: translateX(3px);
+}
+.c-link {
+  transition:
+    opacity var(--duration-hover) ease,
+    transform var(--duration-hover) var(--ease-out);
+}
+.c-link:hover {
+  transform: translateX(4px);
+}
+.c-link:focus-visible {
+  outline: 2px solid rgba(240, 197, 179, 0.85);
+  outline-offset: 3px;
+}
+.qpass3-copy {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.c-link.magnetic {
+  --mag-x: 0px;
+  --mag-y: 0px;
+  transform: translate3d(var(--mag-x), var(--mag-y), 0);
+  transition: transform var(--duration-hover) var(--ease-out);
+}
+.c-link.magnetic:hover {
+  transform: translate3d(var(--mag-x), calc(var(--mag-y) - 1px), 0);
+}
+
+.qpass3-toast {
+  position: fixed;
+  z-index: 1300;
+  left: 50%;
+  bottom: calc(max(22px, env(safe-area-inset-bottom)) + 68px);
+  max-width: calc(100vw - 32px);
+  padding: 11px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  background: linear-gradient(115deg, rgba(17, 17, 17, 0.94), rgba(56, 32, 28, 0.94));
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  font-size: 0.78rem;
+  line-height: 1.4;
+  opacity: 0;
+  transform: translate(-50%, 10px);
+  transition:
+    opacity var(--duration-hover) ease,
+    transform var(--duration-hover) var(--ease-out);
+  pointer-events: none;
+}
+.qpass3-toast.visible {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (hover: none) {
+  .proj-card.qpass3-tilt,
+  .proj-card.qpass3-tilt:hover,
+  .proj-card.qpass3-tilt:focus-visible {
+    transform: none;
+  }
+  .current-project:hover,
+  .svc-row:hover,
+  .sk:hover,
+  .stat:hover,
+  .c-link:hover {
+    transform: none;
+  }
+  .c-link.magnetic,
+  .c-link.magnetic:hover {
+    transform: none;
+  }
+  .sk-tag:hover,
+  .svc-chip:hover,
+  .proj-tags span:hover {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ticker-track {
+    animation: none !important;
+  }
+  .sr,
+  .sr-l,
+  .sr-r,
+  .qpass3-heading-mask > span {
+    opacity: 1;
+    transform: none;
+    transition: none !important;
+  }
+  .current-project,
+  .current-project::before,
+  .current-project-link,
+  .proj-card,
+  .stat,
+  .sk,
+  .sk-tag,
+  .svc-chip,
+  .svc-row,
+  .c-link,
+  .qpass3-toast {
+    transition: none !important;
+  }
+  .proj-card.qpass3-tilt,
+  .proj-card.qpass3-tilt:hover,
+  .proj-card.qpass3-tilt:focus-visible,
+  .current-project:hover,
+  .current-project-link:hover,
+  .stat:hover,
+  .sk:hover,
+  .sk-tag:hover,
+  .svc-chip:hover,
+  .svc-row:hover,
+  .c-link:hover {
+    transform: none;
+  }
+  .c-link.magnetic,
+  .c-link.magnetic:hover {
+    transform: none;
+  }
+}
+/* ===== Pass 3: Scroll, interaction, and warm gradients end ===== */
+
+/* ===== Pass 4: Ask Qasim liquid-glass assistant start ===== */
+.qbot-panel.glass {
+  border: 1px solid rgba(255, 255, 255, 0.68);
+  background:
+    radial-gradient(130% 90% at 100% 0%, rgba(255, 255, 255, 0.74), transparent 56%),
+    linear-gradient(145deg, rgba(250, 247, 243, 0.82), rgba(235, 226, 216, 0.76));
+  box-shadow:
+    0 26px 72px rgba(35, 22, 18, 0.24),
+    0 4px 14px rgba(35, 22, 18, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.92);
+  -webkit-backdrop-filter: blur(26px) saturate(165%);
+  backdrop-filter: blur(26px) saturate(165%);
+  transition:
+    transform 360ms var(--ease-panel),
+    opacity 250ms ease;
+}
+.qbot-panel.glass::after {
+  z-index: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    340px circle at var(--mx, 50%) var(--my, 12%),
+    rgba(255, 255, 255, 0.48),
+    rgba(240, 197, 179, 0.17) 36%,
+    transparent 74%
+  );
+  opacity: 0;
+  transition: opacity var(--duration-hover) ease;
+}
+.qbot-panel.glass:hover::after {
+  opacity: 1;
+}
+.qbot-header,
+.qbot-messages,
+.qbot-suggestions,
+.qbot-chips,
+.qbot-form {
+  position: relative;
+  z-index: 1;
+}
+.qbot-header {
+  padding: 16px 17px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: linear-gradient(112deg, rgba(17, 17, 17, 0.96), rgba(48, 29, 25, 0.94));
+}
+.qbot-heading {
+  gap: 11px;
+}
+.qbot-avatar {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  border-radius: 13px;
+  background: linear-gradient(145deg, #f0c5b3, #c0392b);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.54);
+  color: #321b17;
+  font: 700 0.95rem "Syne", sans-serif;
+}
+.qbot-title {
+  min-height: 1.1em;
+  letter-spacing: -0.02em;
+}
+.qbot-status-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(255, 255, 255, 0.62);
+}
+.qbot-status {
+  width: 6px;
+  height: 6px;
+  background: #78ca8b;
+  box-shadow: 0 0 0 3px rgba(120, 202, 139, 0.12);
+}
+.qbot-close {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.08);
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    opacity var(--duration-hover) ease;
+}
+.qbot-close:hover {
+  transform: scale(1.06);
+  background: rgba(255, 255, 255, 0.08);
+}
+.qbot-messages {
+  background: linear-gradient(155deg, rgba(255, 255, 255, 0.18), rgba(213, 181, 155, 0.08));
+}
+.qbot-message {
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 14px;
+  box-shadow: 0 5px 16px rgba(50, 35, 28, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.66);
+  animation: qbot-message-in 360ms var(--ease-out) both;
+}
+.qbot-bot {
+  border-top-left-radius: 5px;
+  background: rgba(255, 255, 255, 0.62);
+  color: var(--black);
+}
+.qbot-user {
+  border: 1px solid rgba(94, 37, 28, 0.24);
+  border-top-right-radius: 5px;
+  background: linear-gradient(135deg, #211816, #4a2520);
+  box-shadow: 0 7px 18px rgba(62, 31, 26, 0.16), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  color: var(--white);
+}
+.qbot-link {
+  color: #a52f24;
+  text-decoration-thickness: 1px;
+}
+.qbot-user .qbot-link {
+  color: #f2b9a8;
+}
+.qbot-scramble-visual {
+  white-space: inherit;
+}
+.qbot-scramble-word {
+  display: inline-block;
+}
+.qbot-typing {
+  min-width: 54px;
+  border-color: rgba(255, 255, 255, 0.68);
+  background: rgba(255, 255, 255, 0.66);
+}
+.qbot-typing span {
+  background: #a45a4a;
+}
+.qbot-suggestions {
+  margin-top: 4px;
+}
+.qbot-suggestion,
+.qbot-chip {
+  position: relative;
+  overflow: hidden;
+  border-color: rgba(192, 57, 43, 0.22);
+  background: rgba(255, 255, 255, 0.45);
+  color: #8f3025;
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    opacity var(--duration-hover) ease;
+}
+.qbot-suggestion:hover,
+.qbot-chip:hover {
+  transform: translateY(-2px);
+  border-color: rgba(192, 57, 43, 0.3);
+  background: rgba(255, 255, 255, 0.68);
+}
+.qbot-form {
+  border-top: 1px solid rgba(255, 255, 255, 0.58);
+  background: rgba(249, 245, 240, 0.56);
+  -webkit-backdrop-filter: blur(14px) saturate(150%);
+  backdrop-filter: blur(14px) saturate(150%);
+}
+.qbot-input {
+  border-color: rgba(61, 39, 30, 0.14);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: inset 0 1px 2px rgba(58, 35, 27, 0.04);
+}
+.qbot-input:focus {
+  border-color: rgba(192, 57, 43, 0.6);
+}
+.qbot-send {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  background: linear-gradient(145deg, #211816, #4a2520);
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    opacity var(--duration-hover) ease;
+}
+.qbot-send:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(145deg, #211816, #4a2520);
+}
+.qbot-launcher {
+  isolation: isolate;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  border-radius: 14px;
+  background: linear-gradient(125deg, #211816, #4a2520 70%, #71362b);
+  box-shadow: 0 12px 32px rgba(54, 27, 23, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition:
+    transform var(--duration-hover) var(--ease-out),
+    opacity var(--duration-hover) ease;
+}
+.qbot-launcher::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    180px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(255, 255, 255, 0.28),
+    transparent 72%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-hover) ease;
+}
+.qbot-launcher:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(125deg, #211816, #4a2520 70%, #71362b);
+}
+.qbot-launcher:hover::after {
+  opacity: 1;
+}
+.qbot-launcher-label,
+.qbot-launcher-icon {
+  position: relative;
+  z-index: 1;
+}
+.qbot-launcher-icon {
+  color: #f0c5b3;
+}
+.qbot-launcher.qbot-clicked::before {
+  display: none;
+}
+.qbot-close:focus-visible,
+.qbot-send:focus-visible,
+.qbot-launcher:focus-visible,
+.qbot-chip:focus-visible,
+.qbot-suggestion:focus-visible,
+.qbot-input:focus-visible,
+.qbot-link:focus-visible {
+  outline: 2px solid #b44334;
+  outline-offset: 3px;
+}
+@supports not (backdrop-filter: blur(1px)) {
+  .qbot-panel.glass {
+    background: #f2ede8;
+  }
+  .qbot-bot,
+  .qbot-typing {
+    background: #fff;
+  }
+  .qbot-form {
+    background: #ebe6df;
+  }
+}
+@media (hover: none) {
+  .qbot-panel.glass::after,
+  .qbot-launcher::after {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qbot-panel.glass,
+  .qbot-panel.glass::after,
+  .qbot-message,
+  .qbot-close,
+  .qbot-suggestion,
+  .qbot-chip,
+  .qbot-send,
+  .qbot-launcher,
+  .qbot-launcher::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  .qbot-close:hover,
+  .qbot-suggestion:hover,
+  .qbot-chip:hover,
+  .qbot-send:hover,
+  .qbot-launcher:hover {
+    transform: none;
+  }
+}
+/* ===== Pass 4: Ask Qasim liquid-glass assistant end ===== */
