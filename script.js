@@ -1,3 +1,13 @@
+// Tune the entire scroll animation here; CSS and the fallback share these values.
+const heroCardMotion = {
+  flipStart: 0, // Rotation at the hero's top, in degrees.
+  flipEnd: 180, // Rotation at the hero's bottom, in degrees.
+  shrinkStartAngle: 100, // Begin shrinking after the card passes this angle.
+  finalScale: 0.04, // Scale when the card has left the hero.
+  downwardDistance: 42, // Final downward travel, in svh.
+  fadeStart: 0.9, // Begin fading at this normalized hero progress.
+};
+
 const loader = document.getElementById("loader");
 let loaderStarted = false;
 
@@ -144,106 +154,144 @@ function updateActiveNavigation() {
   updateNavIndicator();
 }
 
+const hero = document.getElementById("hero");
 const heroPhoto = document.querySelector(".hero-photo-wrap");
 const flipCard = document.getElementById("flipCard");
-let heroPhotoCentered = false;
-let flipRotation = 0;
-let pendingFlipFrame = 0;
+const flipRotationElement = document.getElementById("flipRotation");
+const shrinkStartProgress = Math.max(
+  0,
+  Math.min(
+    1,
+    (heroCardMotion.shrinkStartAngle - heroCardMotion.flipStart) /
+      (heroCardMotion.flipEnd - heroCardMotion.flipStart),
+  ),
+);
+const supportsScrollTimeline =
+  CSS.supports("animation-timeline: view()") &&
+  CSS.supports("view-timeline-name: --hero-scroll");
+let heroStartY = 0;
+let heroHeight = 0;
+let cardIsGone = null;
 
-function updateHeroPhotoPosition() {
-  const bounds = heroPhoto.getBoundingClientRect();
-  const center = window.innerHeight / 2;
-  heroPhotoCentered = bounds.top < center && bounds.bottom > center;
+function cubicBezierProgress(progress, x1, y1, x2, y2) {
+  const coordinate = (time, first, second) =>
+    3 * (1 - time) ** 2 * time * first +
+    3 * (1 - time) * time ** 2 * second +
+    time ** 3;
+  let low = 0;
+  let high = 1;
+  let time = progress;
+  for (let iteration = 0; iteration < 8; iteration++) {
+    const x = coordinate(time, x1, x2);
+    if (Math.abs(x - progress) < 0.001) break;
+    if (x < progress) low = time;
+    else high = time;
+    time = (low + high) / 2;
+  }
+  return coordinate(time, y1, y2);
 }
 
-function updateFlipCard() {
-  pendingFlipFrame = 0;
-  flipCard.style.transform = `rotateY(${flipRotation.toFixed(1)}deg)`;
+function refreshHeroMetrics() {
+  heroStartY = hero.getBoundingClientRect().top + window.scrollY;
+  heroHeight = hero.offsetHeight;
+  const coverRangeStart =
+    (window.innerHeight / (heroHeight + window.innerHeight)) * 100;
+  document.documentElement.style.setProperty(
+    "--hero-scroll-range-start",
+    `${coverRangeStart}%`,
+  );
 }
 
-function queueFlipCardUpdate() {
-  if (pendingFlipFrame) return;
-  pendingFlipFrame = window.requestAnimationFrame(updateFlipCard);
+function updateHeroCard() {
+  const progress = Math.max(
+    0,
+    Math.min(1, (window.scrollY - heroStartY) / heroHeight),
+  );
+  const gone = progress >= 1;
+
+  if (gone !== cardIsGone) {
+    flipCard.style.visibility = gone ? "hidden" : "visible";
+    heroPhoto.style.visibility = gone ? "hidden" : "visible";
+    flipCard.style.willChange = gone ? "auto" : "transform, opacity";
+    cardIsGone = gone;
+  }
+  if (supportsScrollTimeline) return;
+
+  const flipDegrees =
+    heroCardMotion.flipStart +
+    (heroCardMotion.flipEnd - heroCardMotion.flipStart) * progress;
+  const shrinkProgress = Math.max(
+    0,
+    Math.min(1, (progress - shrinkStartProgress) / (1 - shrinkStartProgress)),
+  );
+  const easedShrink = cubicBezierProgress(shrinkProgress, 0.22, 1, 0.36, 1);
+  const scale = 1 + (heroCardMotion.finalScale - 1) * easedShrink;
+  const downwardDistance = heroCardMotion.downwardDistance * easedShrink;
+  const fadeProgress = Math.max(
+    0,
+    Math.min(1, (progress - heroCardMotion.fadeStart) / (1 - heroCardMotion.fadeStart)),
+  );
+  flipCard.style.transform = `translate3d(0, ${downwardDistance}svh, 0) scale(${scale})`;
+  flipCard.style.opacity = String(1 - fadeProgress);
+  flipRotationElement.style.transform = `rotateY(${flipDegrees}deg)`;
+}
+
+if (supportsScrollTimeline) {
+  const style = document.createElement("style");
+  style.textContent = `
+    @keyframes hero-card-motion {
+      0% {
+        transform: translate3d(0, 0, 0) scale(1);
+      }
+      ${shrinkStartProgress * 100}% {
+        transform: translate3d(0, 0, 0) scale(1);
+        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      100% {
+        transform: translate3d(0, ${heroCardMotion.downwardDistance}svh, 0) scale(${heroCardMotion.finalScale});
+      }
+    }
+    @keyframes hero-card-flip {
+      from { transform: rotateY(${heroCardMotion.flipStart}deg); }
+      to { transform: rotateY(${heroCardMotion.flipEnd}deg); }
+    }
+    @keyframes hero-card-opacity {
+      0%, ${heroCardMotion.fadeStart * 100}% { opacity: 1; }
+      100% { opacity: 0; }
+    }
+    html.has-scroll-timeline #flipCard {
+      animation-name: hero-card-motion, hero-card-opacity;
+      animation-duration: 1s, 1s;
+      animation-timing-function: linear, linear;
+      animation-fill-mode: both, both;
+      animation-timeline: --hero-scroll, --hero-scroll;
+      animation-range: cover var(--hero-scroll-range-start) 100%, cover var(--hero-scroll-range-start) 100%;
+    }
+    html.has-scroll-timeline #flipRotation {
+      animation: hero-card-flip 1s linear both;
+      animation-timeline: --hero-scroll;
+      animation-range: cover var(--hero-scroll-range-start) 100%;
+    }
+  `;
+  document.head.append(style);
+  document.documentElement.classList.add("has-scroll-timeline");
 }
 
 scrollTasks.add(updateActiveNavigation);
-scrollTasks.add(updateHeroPhotoPosition);
-updateHeroPhotoPosition();
-
-const reduceHeroMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-window.addEventListener(
-  "wheel",
-  (event) => {
-    if (
-      reduceHeroMotion.matches ||
-      !heroPhotoCentered ||
-      event.deltaY === 0
-    ) return;
-    const direction = Math.sign(event.deltaY);
-    if ((direction > 0 && flipRotation >= 180) || (direction < 0 && flipRotation <= 0)) return;
-
-    event.preventDefault();
-    const deltaScale =
-      event.deltaMode === WheelEvent.DOM_DELTA_LINE
-        ? 16
-        : event.deltaMode === WheelEvent.DOM_DELTA_PAGE
-          ? window.innerHeight
-          : 1;
-    const delta = Math.abs(event.deltaY) * deltaScale;
-    flipRotation = Math.max(
-      0,
-      Math.min(180, flipRotation + direction * Math.min(36, delta * 0.12)),
-    );
-    queueFlipCardUpdate();
-  },
-  { passive: false },
-);
-
-let previousTouchY = 0;
-document.addEventListener(
-  "touchstart",
-  (event) => {
-    previousTouchY = event.touches[0].clientY;
-  },
-  { passive: true },
-);
-document.addEventListener(
-  "touchmove",
-  (event) => {
-    if (reduceHeroMotion.matches || !heroPhotoCentered) return;
-    const currentTouchY = event.touches[0].clientY;
-    const delta = previousTouchY - currentTouchY;
-    const direction = Math.sign(delta);
-    if (
-      delta === 0 ||
-      (direction > 0 && flipRotation >= 180) ||
-      (direction < 0 && flipRotation <= 0)
-    ) {
-      previousTouchY = currentTouchY;
-      return;
-    }
-
-    event.preventDefault();
-    flipRotation = Math.max(
-      0,
-      Math.min(180, flipRotation + direction * Math.min(30, Math.abs(delta) * 0.5)),
-    );
-    previousTouchY = currentTouchY;
-    queueFlipCardUpdate();
-  },
-  { passive: false },
-);
+scrollTasks.add(updateHeroCard);
+refreshHeroMetrics();
+updateHeroCard();
 
 refreshNavSectionPositions();
 window.addEventListener("load", () => {
-  updateHeroPhotoPosition();
+  refreshHeroMetrics();
   refreshNavSectionPositions();
   activeNavHref = "";
   activeSectionId = "";
   scheduleScrollWork();
 }, { once: true });
 window.addEventListener("resize", () => {
-  updateHeroPhotoPosition();
+  refreshHeroMetrics();
   refreshNavSectionPositions();
   activeNavHref = "";
   activeSectionId = "";
