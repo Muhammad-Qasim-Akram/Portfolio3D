@@ -3599,3 +3599,139 @@ button:not(:disabled),
     cursor: text;
   }
 }
+
+/* perf: Move pointer highlights on clipped child layers instead of repainting blurred surfaces. */
+.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 640px;
+  --qpass3-glow-background: radial-gradient(
+    320px circle at 50% 50%,
+    rgba(255, 255, 255, 0.22),
+    transparent 72%
+  );
+}
+.services-surface.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 720px;
+  --qpass3-glow-background: radial-gradient(
+    360px circle at 50% 50%,
+    rgba(255, 255, 255, 0.42),
+    rgba(240, 197, 179, 0.16) 42%,
+    transparent 76%
+  );
+}
+.contact-box.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 920px;
+  --qpass3-glow-background: radial-gradient(
+    460px circle at 50% 50%,
+    rgba(255, 255, 255, 0.16),
+    rgba(240, 197, 179, 0.12) 38%,
+    transparent 74%
+  );
+}
+.stack-grid.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 760px;
+  --qpass3-glow-background: radial-gradient(
+    380px circle at 50% 50%,
+    rgba(255, 255, 255, 0.46),
+    rgba(240, 197, 179, 0.16) 42%,
+    transparent 76%
+  );
+}
+footer.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 960px;
+  --qpass3-glow-background: radial-gradient(
+    480px circle at 50% 50%,
+    rgba(255, 255, 255, 0.16),
+    rgba(240, 197, 179, 0.12) 38%,
+    transparent 76%
+  );
+}
+.qbot-panel.glass:not(.proj-card):not(.nav-mobile-menu) {
+  --qpass3-glow-size: 680px;
+  --qpass3-glow-background: radial-gradient(
+    340px circle at 50% 50%,
+    rgba(255, 255, 255, 0.48),
+    rgba(240, 197, 179, 0.17) 36%,
+    transparent 74%
+  );
+}
+.qbot-launcher {
+  --qpass3-glow-size: 360px;
+  --qpass3-glow-background: radial-gradient(
+    180px circle at 50% 50%,
+    rgba(255, 255, 255, 0.28),
+    transparent 72%
+  );
+}
+.glass-pointer-glow {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+.glass-pointer-glow__light {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--qpass3-glow-size, 640px);
+  height: var(--qpass3-glow-size, 640px);
+  border-radius: 50%;
+  background: var(--qpass3-glow-background);
+  opacity: 0;
+  transform: translate3d(-50%, -50%, 0);
+  transition: opacity var(--duration-hover) ease;
+  pointer-events: none;
+}
+.glass::after,
+.qbot-launcher::after {
+  display: none;
+}
+.services-surface.glass > .glass-pointer-glow,
+.contact-box.glass > .glass-pointer-glow,
+.stack-grid.glass > .glass-pointer-glow,
+footer.glass > .glass-pointer-glow,
+.qbot-panel.glass > .glass-pointer-glow,
+.qbot-launcher > .glass-pointer-glow {
+  position: absolute;
+  z-index: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .glass:hover > .glass-pointer-glow > .glass-pointer-glow__light,
+  .qbot-launcher:hover > .glass-pointer-glow > .glass-pointer-glow__light {
+    opacity: 1;
+  }
+}
+@media (hover: none) {
+  .glass-pointer-glow__light {
+    display: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .qbot-panel.glass > .glass-pointer-glow > .glass-pointer-glow__light,
+  .qbot-launcher > .glass-pointer-glow > .glass-pointer-glow__light {
+    transition: none !important;
+  }
+}
+
+/* perf: Let the rAF loop drive active transforms; restore the original CSS transitions at rest. */
+.proj-card.glass.qpass3-tilt.qpass1-pointer-active {
+  transition-property: opacity, translate;
+}
+.magnetic.qpass1-pointer-active {
+  transition-property: background-color, border-color;
+}
+
+/* perf: Prevent moving content from repeatedly entering and leaving the stationary pointer during scroll. */
+.qpass1-pointer-scrolling .proj-card,
+.qpass1-pointer-scrolling .glass:not(#navbar) {
+  pointer-events: none;
+}
+.qpass1-pointer-scrolling .proj-card.glass {
+  transition-property: opacity, translate !important;
+  transform: none !important;
+  transform-style: flat;
+}
+.qpass1-pointer-scrolling .glass-pointer-glow__light {
+  opacity: 0 !important;
+}
