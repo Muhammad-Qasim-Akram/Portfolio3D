@@ -255,7 +255,7 @@ const io = new IntersectionObserver(
   (entries) => entries.forEach((entry) => {
     entry.target.classList.toggle("in", entry.isIntersecting);
   }),
-  { threshold: 0.07, rootMargin: "0px 0px -8% 0px" },
+  { threshold: 0.07, rootMargin: "-100px 0px -12% 0px" },
 );
 document.querySelectorAll(".sr,.sr-l,.sr-r").forEach((el) => io.observe(el));
 
