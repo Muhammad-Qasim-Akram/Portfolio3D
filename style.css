@@ -3866,3 +3866,652 @@ footer.glass > .glass-pointer-glow,
 .qpass1-pointer-scrolling .glass-pointer-glow__light {
   opacity: 0 !important;
 }
+/* Responsive repair: navbar + hero layout. Appended intentionally so it overrides
+   earlier responsive rules without replacing the existing animation system. */
+@media (max-width: 640px) {
+  nav {
+    width: calc(100% - 24px);
+    max-width: none;
+    padding: 8px 8px 8px 14px;
+    gap: 8px;
+    top: max(10px, env(safe-area-inset-top));
+    border-radius: 12px;
+  }
+
+  .nav-name {
+    min-width: 0;
+    flex: 1 1 auto;
+    font-size: clamp(0.78rem, 3.5vw, 0.92rem);
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nav-right {
+    flex: 0 0 auto;
+    gap: 6px;
+  }
+
+  .btn-nav {
+    padding: 9px 12px;
+    font-size: 0.74rem;
+  }
+
+  .nav-ham {
+    width: 34px;
+    height: 34px;
+  }
+
+  .nav-mobile-menu {
+    top: calc(max(10px, env(safe-area-inset-top)) + 54px);
+    left: 12px;
+    right: 12px;
+  }
+
+  /* Keep the hero content in normal grid flow on narrow screens. */
+  #hero {
+    height: auto;
+    min-height: 200svh;
+    min-height: 200dvh;
+  }
+
+  .hero-stage {
+    position: sticky;
+    top: 0;
+    height: 100svh;
+    height: 100dvh;
+    min-height: 580px;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto minmax(0, 1fr);
+    align-content: center;
+    justify-items: center;
+    gap: 8px;
+    padding: 78px 18px 18px;
+    overflow: visible;
+  }
+
+  .hero-left {
+    position: relative;
+    top: auto;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+  }
+
+  .hero-hey {
+    width: 100%;
+    font-size: clamp(2.25rem, 10vw, 3.1rem);
+    line-height: 0.9;
+    margin-bottom: 10px;
+    text-align: center;
+  }
+
+  .hero-tagline {
+    width: 100%;
+    max-width: 360px;
+    font-size: clamp(0.72rem, 3.2vw, 0.82rem);
+    line-height: 1.45;
+    margin: 0 auto 8px;
+    text-align: center;
+  }
+
+  .scroll-hint {
+    justify-content: center;
+    gap: 8px;
+    font-size: 0.6rem;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-photo-wrap {
+    position: relative;
+    top: auto;
+    align-self: center;
+    width: clamp(132px, 39vw, 172px);
+    max-width: 100%;
+    margin: 4px auto 28px;
+    flex-shrink: 0;
+  }
+
+  .flip-cue {
+    bottom: -23px;
+    font-size: 0.56rem;
+  }
+
+  .photo-badge {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    padding: 7px 8px;
+    border-radius: 9px;
+  }
+
+  .badge-name {
+    font-size: 0.72rem;
+  }
+
+  .badge-avail {
+    gap: 4px;
+    font-size: 0.57rem;
+  }
+
+  .hero-right {
+    position: relative;
+    bottom: auto;
+    width: 100%;
+    min-width: 0;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: center;
+    align-self: start;
+    padding-bottom: 4px;
+  }
+
+  .hero-bio {
+    width: 100%;
+    max-width: 390px;
+    font-size: clamp(0.72rem, 3.1vw, 0.8rem);
+    line-height: 1.45;
+    margin: 0 auto 10px;
+  }
+
+  .hero-cta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .hero-cta .btn-primary,
+  .hero-cta .btn-outline {
+    justify-content: center;
+    padding: 10px 16px;
+    font-size: 0.76rem;
+  }
+
+  .hero-bg-word {
+    bottom: 0;
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(3.5rem, 20vw, 7rem);
+  }
+}
+
+@media (max-width: 380px) {
+  nav {
+    width: calc(100% - 20px);
+    padding-left: 11px;
+    gap: 5px;
+  }
+
+  .nav-name {
+    font-size: 0.76rem;
+  }
+
+  .btn-nav {
+    padding: 8px 9px;
+    font-size: 0.7rem;
+  }
+
+  .nav-right {
+    gap: 5px;
+  }
+
+  .hero-stage {
+    min-height: 600px;
+    padding: 72px 14px 14px;
+    gap: 6px;
+  }
+
+  .hero-hey {
+    font-size: clamp(2rem, 9.5vw, 2.4rem);
+    margin-bottom: 8px;
+  }
+
+  .hero-photo-wrap {
+    width: min(142px, 38vw);
+    margin-bottom: 26px;
+  }
+
+  .hero-bio {
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+}
+
+
+/* Compact landscape / half-width desktop repair.
+   Keep the portrait in the open center-right area and reserve room for the CTA
+   so it never collides with the ticker below the hero. */
+@media (min-width: 641px) and (max-width: 1000px) and (max-height: 700px) {
+  #hero {
+    height: max(200dvh, 1240px);
+  }
+
+  .hero-stage {
+    box-sizing: border-box;
+    height: max(100dvh, 620px);
+    min-height: 620px;
+    grid-template-columns: minmax(0, 1fr) minmax(150px, 25vw);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: center;
+    align-content: center;
+    column-gap: clamp(18px, 3vw, 34px);
+    row-gap: 8px;
+    padding: 82px 28px 44px;
+    overflow: visible;
+  }
+
+  .hero-left {
+    grid-column: 1;
+    grid-row: 1;
+    align-self: end;
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-hey {
+    font-size: clamp(2.2rem, 5.2vw, 3.2rem);
+    line-height: 0.9;
+    margin-bottom: 10px;
+  }
+
+  .hero-tagline {
+    max-width: 100%;
+    font-size: clamp(0.72rem, 1.25vw, 0.82rem);
+    line-height: 1.45;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+
+  .scroll-hint {
+    justify-content: center;
+    font-size: 0.58rem;
+  }
+
+  .hero-photo-wrap {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    position: relative;
+    top: auto;
+    align-self: center;
+    justify-self: center;
+    width: min(25vw, 188px);
+    margin: 0;
+  }
+
+  .hero-right {
+    grid-column: 1;
+    grid-row: 2;
+    align-self: start;
+    width: 100%;
+    min-width: 0;
+    padding: 0 0 18px;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-bio {
+    max-width: 100%;
+    font-size: clamp(0.72rem, 1.2vw, 0.8rem);
+    line-height: 1.42;
+    margin-bottom: 10px;
+  }
+
+  .hero-cta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .hero-cta .btn-primary,
+  .hero-cta .btn-outline {
+    padding: 9px 13px;
+    font-size: 0.73rem;
+  }
+
+  .hero-bg-word {
+    bottom: 0;
+    font-size: clamp(4rem, 12vw, 7rem);
+    max-width: 100%;
+    overflow: hidden;
+  }
+}
+
+/* Targeted responsive corrections: hero positioning and service-row clipping. */
+@media (max-width: 1000px) {
+  .hero-stage {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: center;
+    justify-items: stretch;
+    row-gap: clamp(12px, 2.5svh, 24px);
+    height: 100svh;
+    height: 100dvh;
+    min-height: 0;
+    padding: clamp(84px, 12svh, 112px) clamp(18px, 5vw, 36px) 28px;
+  }
+
+  .hero-left,
+  .hero-right {
+    grid-column: 1;
+    position: relative;
+    inset: auto;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .hero-left { grid-row: 1; }
+
+  .hero-photo-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    align-self: center;
+    justify-self: center;
+    width: clamp(132px, 25vw, 190px);
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .hero-right { grid-row: 3; }
+
+  .hero-bio {
+    width: 100%;
+    max-width: 560px;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-cta {
+    position: relative;
+    z-index: 3;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: clamp(18px, 4svh, 36px);
+  }
+
+  .hero-bg-word {
+    max-width: 100%;
+    overflow: hidden;
+    font-size: clamp(3.5rem, 17vw, 7rem);
+  }
+}
+
+@media (max-width: 640px) {
+  #navbar {
+    width: calc(100% - 24px);
+    max-width: none;
+  }
+
+  .nav-name {
+    font-size: clamp(0.78rem, 3.5vw, 0.95rem);
+  }
+
+  .nav-right { gap: 6px; }
+
+  .btn-nav {
+    padding: 9px clamp(10px, 3vw, 16px);
+  }
+
+  .hero-stage {
+    row-gap: 12px;
+    padding: 84px 18px 20px;
+  }
+
+  .hero-hey {
+    font-size: clamp(2.1rem, 9vw, 3rem);
+    line-height: 0.9;
+    margin-bottom: 8px;
+  }
+
+  .hero-tagline {
+    max-width: 100%;
+    margin-bottom: 0;
+    font-size: clamp(0.72rem, 3.3vw, 0.82rem);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+  }
+
+  .hero-photo-wrap {
+    width: clamp(118px, 38vw, 158px);
+  }
+
+  .hero-bio {
+    max-width: 100%;
+    font-size: clamp(0.72rem, 3.2vw, 0.8rem);
+    line-height: 1.45;
+    margin-bottom: 10px;
+  }
+
+  .hero-cta {
+    flex-direction: row;
+    justify-content: center;
+    margin-bottom: 24px;
+  }
+
+  .hero-cta .btn-primary,
+  .hero-cta .btn-outline {
+    max-width: 100%;
+    white-space: nowrap;
+  }
+
+  .services-surface.glass {
+    width: 100%;
+    max-width: 100%;
+    overflow: visible;
+    padding: 8px;
+  }
+
+  .services-surface > .svc-row,
+  .svc-row {
+    min-width: 0;
+    width: 100%;
+    gap: 10px;
+    padding: 16px 12px;
+    align-items: flex-start;
+  }
+
+  .svc-row > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .svc-name,
+  .svc-chip,
+  .svc-num {
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
+  .svc-chip {
+    flex-shrink: 1;
+    white-space: normal;
+    text-align: right;
+  }
+}
+
+@media (max-width: 390px) {
+  .nav-name { font-size: 0.76rem; }
+  .btn-nav { padding: 8px 9px; font-size: 0.72rem; }
+  .nav-right { gap: 5px; }
+  .hero-stage { padding-left: 14px; padding-right: 14px; }
+  .hero-cta { gap: 8px; }
+  .svc-row { padding: 14px 9px; gap: 7px; }
+}
+
+@media (max-width: 1000px) and (max-height: 600px) {
+  .hero-stage {
+    grid-template-columns: minmax(0, 1fr) minmax(100px, 25vw);
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+    align-content: stretch;
+    row-gap: 0;
+    padding: 76px 18px 14px;
+  }
+  .hero-left { grid-column: 1; grid-row: 1; }
+  .hero-photo-wrap {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    width: min(25vw, 160px);
+    align-self: center;
+    justify-self: center;
+  }
+  .hero-right { grid-column: 1; grid-row: 2; }
+  .hero-cta { margin-bottom: 12px; }
+}
+
+/* Final responsive correction: keep the hero in a true vertical flow on narrow screens,
+   even when the viewport is short (e.g. split browser / iPhone simulator). */
+@media (max-width: 1000px) {
+  .hero-stage {
+    height: auto;
+    min-height: 100svh;
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    justify-items: stretch;
+    row-gap: clamp(14px, 2.5vh, 24px);
+    padding-top: clamp(94px, 13vh, 120px);
+    padding-bottom: 56px;
+  }
+
+  .hero-left {
+    grid-column: 1;
+    grid-row: 1;
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-tagline {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .hero-photo-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    position: relative;
+    top: auto;
+    left: auto;
+    right: auto;
+    align-self: center;
+    justify-self: center;
+    width: clamp(132px, 24vw, 180px);
+    max-width: 70%;
+    margin: 0 auto;
+  }
+
+  .hero-right {
+    grid-column: 1;
+    grid-row: 3;
+    width: 100%;
+    min-width: 0;
+    text-align: center;
+    align-items: center;
+  }
+
+  .hero-bio {
+    width: 100%;
+    max-width: 620px;
+    margin: 0 auto 16px;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+
+  .hero-cta {
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 0 0 44px;
+  }
+
+  .hero-bg-word {
+    bottom: 0;
+    max-width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+  }
+}
+
+/* Do not switch the portrait back to a side column just because the viewport is short. */
+@media (max-width: 1000px) and (max-height: 600px) {
+  .hero-stage {
+    height: auto;
+    min-height: 100svh;
+    min-height: 100dvh;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto auto auto;
+    align-content: start;
+    row-gap: 14px;
+    padding: 88px 18px 48px;
+  }
+
+  .hero-left { grid-column: 1; grid-row: 1; }
+  .hero-photo-wrap {
+    grid-column: 1;
+    grid-row: 2;
+    width: clamp(120px, 22vw, 150px);
+    position: relative;
+    top: auto;
+    justify-self: center;
+  }
+  .hero-right { grid-column: 1; grid-row: 3; }
+  .hero-cta { margin-bottom: 44px; }
+}
+
+/* Keep service titles on one readable line where possible; never collapse into one letter per line. */
+.svc-row {
+  display: grid;
+  grid-template-columns: 32px minmax(0, 1fr) minmax(0, auto);
+  align-items: center;
+  column-gap: 12px;
+}
+.svc-num { min-width: 0; }
+.svc-name {
+  min-width: 0;
+  padding: 0 8px;
+  overflow-wrap: normal;
+  word-break: normal;
+  white-space: normal;
+}
+.svc-chips {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 640px) {
+  .svc-row {
+    grid-template-columns: 24px minmax(0, 1fr);
+    row-gap: 10px;
+    column-gap: 8px;
+    padding: 14px 10px;
+  }
+  .svc-name {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: clamp(1rem, 4.5vw, 1.25rem);
+    padding: 0;
+  }
+  .svc-chips {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-start;
+  }
+  .svc-chip { white-space: nowrap; }
+}
