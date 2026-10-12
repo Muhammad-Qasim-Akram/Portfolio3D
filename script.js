@@ -166,9 +166,6 @@ const shrinkStartProgress = Math.max(
       (heroCardMotion.flipEnd - heroCardMotion.flipStart),
   ),
 );
-const supportsScrollTimeline =
-  CSS.supports("animation-timeline: view()") &&
-  CSS.supports("view-timeline-name: --hero-scroll");
 let heroStartY = 0;
 let heroHeight = 0;
 let cardIsGone = null;
@@ -194,12 +191,6 @@ function cubicBezierProgress(progress, x1, y1, x2, y2) {
 function refreshHeroMetrics() {
   heroStartY = hero.getBoundingClientRect().top + window.scrollY;
   heroHeight = hero.offsetHeight;
-  const coverRangeStart =
-    (window.innerHeight / (heroHeight + window.innerHeight)) * 100;
-  document.documentElement.style.setProperty(
-    "--hero-scroll-range-start",
-    `${coverRangeStart}%`,
-  );
 }
 
 function updateHeroCard() {
@@ -215,8 +206,6 @@ function updateHeroCard() {
     flipCard.style.willChange = gone ? "auto" : "transform, opacity";
     cardIsGone = gone;
   }
-  if (supportsScrollTimeline) return;
-
   const flipDegrees =
     heroCardMotion.flipStart +
     (heroCardMotion.flipEnd - heroCardMotion.flipStart) * progress;
@@ -234,47 +223,6 @@ function updateHeroCard() {
   flipCard.style.transform = `translate3d(0, ${downwardDistance}svh, 0) scale(${scale})`;
   flipCard.style.opacity = String(1 - fadeProgress);
   flipRotationElement.style.transform = `rotateY(${flipDegrees}deg)`;
-}
-
-if (supportsScrollTimeline) {
-  const style = document.createElement("style");
-  style.textContent = `
-    @keyframes hero-card-motion {
-      0% {
-        transform: translate3d(0, 0, 0) scale(1);
-      }
-      ${shrinkStartProgress * 100}% {
-        transform: translate3d(0, 0, 0) scale(1);
-        animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
-      }
-      100% {
-        transform: translate3d(0, ${heroCardMotion.downwardDistance}svh, 0) scale(${heroCardMotion.finalScale});
-      }
-    }
-    @keyframes hero-card-flip {
-      from { transform: rotateY(${heroCardMotion.flipStart}deg); }
-      to { transform: rotateY(${heroCardMotion.flipEnd}deg); }
-    }
-    @keyframes hero-card-opacity {
-      0%, ${heroCardMotion.fadeStart * 100}% { opacity: 1; }
-      100% { opacity: 0; }
-    }
-    html.has-scroll-timeline #flipCard {
-      animation-name: hero-card-motion, hero-card-opacity;
-      animation-duration: 1s, 1s;
-      animation-timing-function: linear, linear;
-      animation-fill-mode: both, both;
-      animation-timeline: --hero-scroll, --hero-scroll;
-      animation-range: cover var(--hero-scroll-range-start) 100%, cover var(--hero-scroll-range-start) 100%;
-    }
-    html.has-scroll-timeline #flipRotation {
-      animation: hero-card-flip 1s linear both;
-      animation-timeline: --hero-scroll;
-      animation-range: cover var(--hero-scroll-range-start) 100%;
-    }
-  `;
-  document.head.append(style);
-  document.documentElement.classList.add("has-scroll-timeline");
 }
 
 scrollTasks.add(updateActiveNavigation);
@@ -1335,4 +1283,19 @@ const BOT_DATA = {
     console.error("Could not copy the contact email address.", copyError);
     showToast(`Copy didn't work. You can email me at ${email}.`);
   });
+})();
+
+/* Touch devices: play the project card hover effects when a card is in view.
+   Paste at the end of script.js. The matching CSS is in responsive-fixes.css. */
+(() => {
+  if (!window.matchMedia('(hover: none)').matches) return;
+  const cards = document.querySelectorAll('.proj-card');
+  if (!cards.length || !('IntersectionObserver' in window)) return;
+  const io = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((e) => e.target.classList.toggle('is-inview', e.isIntersecting));
+    },
+    { rootMargin: '-30% 0px -30% 0px', threshold: 0 }
+  );
+  cards.forEach((c) => io.observe(c));
 })();
