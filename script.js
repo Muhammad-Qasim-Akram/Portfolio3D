@@ -1,11 +1,11 @@
 // Tune the entire scroll animation here; CSS and the fallback share these values.
 const heroCardMotion = {
   flipStart: 0, // Rotation at the hero's top, in degrees.
-  flipEnd: 180, // Rotation at the hero's bottom, in degrees.
-  shrinkStartAngle: 100, // Begin shrinking after the card passes this angle.
-  finalScale: 0.04, // Scale when the card has left the hero.
-  downwardDistance: 42, // Final downward travel, in svh.
-  fadeStart: 0.9, // Begin fading at this normalized hero progress.
+  flipEnd: 360, // Rotation at the hero's bottom, in degrees.
+  shrinkStartAngle: 160, // Begin shrinking after the card passes this angle.
+  finalScale: 0.4, // Scale when the card has left the hero.
+  downwardDistance: 45, // Final downward travel, in svh.
+  fadeStart: 0.8, // Begin fading at this normalized hero progress.
 };
 
 const loader = document.getElementById("loader");
