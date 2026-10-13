@@ -2,7 +2,7 @@
 
 Personal portfolio of **Muhammad Qasim Akram**, a Full Stack Developer and AI Engineer based in Pakistan.
 
-**Live site:** [qasim-akram.netlify.app](https://qasim-akram.netlify.app)
+**Live site:** [qasim-akram.netlify.app](https://qasimakram.vercel.app)
 
 ![Portfolio homepage](img/portfolio-homepage.png)
 
