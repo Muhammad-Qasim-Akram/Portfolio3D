@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>Portfolio Performance Case Study | Qasim Akram</title>
+  <meta name="description"
+    content="How I kept a blur-heavy, animated portfolio smooth: a ranked performance audit, a live frame meter and a reproduction of a scroll-jitter bug. By Qasim Akram.">
+  <link rel="canonical" href="https://qasim-akram.netlify.app/case-portfolio.html">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Portfolio Performance Case Study | Qasim Akram">
+  <meta property="og:description"
+    content="Live tools that show what blur costs, and the hover loop that made cards shake.">
+  <meta property="og:image" content="https://qasim-akram.netlify.app/img/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap"
+    rel="stylesheet">
+  <link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+  <link rel="stylesheet" href="case.css">
+  <link rel="stylesheet" href="case2.css">
+</head>
+
+<body>
+ 
+
+  <header class="cnav">
+    <a class="back" href="index.html#projects">&larr; Portfolio</a>
+    <span class="mid">Case study 02 <i>/</i> Performance</span>
+    <a class="live" href="index.html">View the site &#8599;</a>
+  </header>
+
+  <main>
+    <section class="chero">
+      <div class="bgword" aria-hidden="true">SMOOTH</div>
+      <div class="eyebrow sr">Case study 02</div>
+      <h1 class="sr" style="--d:.06s">Glass, but&nbsp;<em>fast.</em></h1>
+      <p class="lead sr" style="--d:.12s">This portfolio leans on blur, glow and 3D tilt, and it still has to run
+        smoothly on a phone. This page shows how I found what was costing frames, fixed it, and kept the look. Two of
+        the tools below run live on your own device.</p>
+      <div class="chips sr" style="--d:.18s"><span>backdrop-filter</span><span>CSS
+          transforms</span><span>requestAnimationFrame</span><span>IntersectionObserver</span><span>Vanilla
+          JS</span><span>Netlify</span></div>
+      <div class="stats">
+        <div class="stat gc sr" style="--d:.1s"><b><span data-from="704"
+              data-to="39">704</span><sup>KB</sup></b><span>index.html, after moving inline images out into files</span>
+        </div>
+        <div class="stat gc sr" style="--d:.16s"><b>0</b><span>frameworks or build steps in the whole site</span></div>
+        <div class="stat gc live-stat sr" id="heroFps" style="--d:.22s"><b><span
+              id="heroFpsNum">--</span><small>fps</small></b><span>measured on your device while you read this</span>
+        </div>
+        <div class="stat gc sr" style="--d:.28s"><b>3</b><span>separate causes behind one scroll jitter bug</span></div>
+      </div>
+    </section>
+
+    <section class="csec" id="problem">
+      <div class="eyebrow sr">The problem</div>
+      <h2 class="sr">It looked great and ran badly.</h2>
+      <p class="sub sr">Screen recording the site made it stutter, and scrolling past project cards made them shake.
+        Four rules shaped the fix.</p>
+      <div class="cons">
+        <div class="con gc sr" style="--d:.04s"><span class="n">01</span>
+          <h3>Keep the look</h3>
+          <p>Glass, glow and tilt are the point of the site. Cheaper paths, not fewer effects.</p>
+        </div>
+        <div class="con gc sr" style="--d:.1s"><span class="n">02</span>
+          <h3>Measure first</h3>
+          <p>Rank the costs before touching code, so every change has a reason.</p>
+        </div>
+        <div class="con gc sr" style="--d:.16s"><span class="n">03</span>
+          <h3>No build step</h3>
+          <p>Plain HTML, CSS and JS on Netlify. Fixes have to work without tooling.</p>
+        </div>
+        <div class="con gc sr" style="--d:.22s"><span class="n">04</span>
+          <h3>Phones count</h3>
+          <p>Same effects on touch, with the same interactions and a lower cost.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="csec" id="glasslab">
+      <div class="eyebrow sr">Try it</div>
+      <h2 class="sr">Feel what blur costs.</h2>
+      <p class="sub sr">Every card below blurs what sits behind it. Push the sliders and watch the frame meter on your
+        own device. Then switch to blurring only two cards and compare.</p>
+      <div class="labwrap">
+        <div class="lab" id="lab" data-mode="all" aria-label="Glass cards over a moving background">
+          <div class="lab-bg" aria-hidden="true"><span class="blob"></span><span class="blob"></span><span
+              class="blob"></span>
+            <div class="stripes"></div>
+          </div>
+          <div class="lab-cards" id="labCards"></div>
+          <div class="lab-note">Drag to tilt the scene</div>
+        </div>
+        <aside class="panel gc sr">
+          <h3>Live frame meter</h3>
+          <div class="fps" id="fps"><b id="fpsNum">--</b><span>frames per second</span></div>
+          <canvas class="graph" id="graph" width="280" height="44" aria-hidden="true"></canvas>
+          <div class="worst" id="worst">Worst frame: -- ms</div>
+          <div class="ctl">
+            <label>Blur strength <output id="blurOut">18 px</output></label>
+            <input type="range" id="blur" min="0" max="40" value="18" aria-label="Blur strength">
+            <label>Glass cards <output id="countOut">12</output></label>
+            <input type="range" id="count" min="1" max="30" value="12" aria-label="Number of glass cards">
+            <div class="seg" role="group" aria-label="Blur mode"><button id="mAll" aria-pressed="true">Blur every
+                card</button><button id="mLight" aria-pressed="false">Blur only 2</button></div>
+            <button class="tgl" id="motion" aria-pressed="true">Animate background <i>On</i></button>
+          </div>
+          <p class="hintline">Numbers are live and depend on your screen and device. A 60 Hz display tops out near 60.
+          </p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="csec" id="buglab">
+      <div class="eyebrow sr">Reproduce it</div>
+      <h2 class="sr">The card that shook.</h2>
+      <p class="sub sr">The cursor sits on the bottom edge of a card. When the card lifts on hover, the cursor is no
+        longer over it, so it drops, so it is hovered again, and it shakes. Switch to the fix, or drag the cursor
+        around. This is a simplified recreation, not the site's own code.</p>
+      <div class="buglab">
+        <div class="arena" id="arena" data-mode="bug" aria-label="Hover loop demo">
+          <div class="arena-tip">Drag anywhere to move the cursor</div>
+          <div class="slot" id="slot">
+            <div class="bcard" id="bcard"><span>Project card</span><small id="bstate">hover: off</small></div>
+          </div>
+          <div class="cursor" id="cursor"></div>
+        </div>
+        <aside class="bugpanel gc sr">
+          <div class="seg" role="group" aria-label="Version"><button id="vBug" aria-pressed="true">Before the
+              fix</button><button id="vFix" aria-pressed="false">After the fix</button></div>
+          <div class="flips" id="flips"><b id="flipNum">0</b><span>hover flips in the last second</span></div>
+          <canvas class="strip" id="strip" width="300" height="18" aria-hidden="true"></canvas>
+          <pre class="code" id="bugCode" aria-label="CSS"></pre>
+          <p id="bugText"></p>
+        </aside>
+      </div>
+    </section>
+
+    <section class="csec" id="passes">
+      <div class="eyebrow sr">How I fixed it</div>
+      <h2 class="sr">Audit first, then fix in order.</h2>
+      <div class="tabs" id="tabs" role="tablist" aria-label="Passes"></div>
+      <div class="tabpanel gc" id="tabpanel" role="tabpanel"></div>
+    </section>
+
+    <section class="csec" id="results">
+      <div class="eyebrow sr">Results</div>
+      <h2 class="sr">What changed, in numbers.</h2>
+      <p class="sub sr">Only figures I can show. File sizes are checkable in the repo.</p>
+      <div class="rrows" id="rrows"></div>
+      <p class="rsrc" id="rsrc"></p>
+    </section>
+
+    <section class="csec" id="change">
+      <div class="eyebrow sr">Looking back</div>
+      <h2 class="sr">What is still on the list.</h2>
+      <div class="acc" id="acc"></div>
+    </section>
+
+    <div class="crosslink sr"><a class="gc" href="case-chatroom.html"><span><small>Case study 01</small>How ChatRoom
+          works under the hood</span><b>&rarr;</b></a></div>
+  </main>
+
+  <footer class="cfoot">
+    <h2>Want to talk about it?</h2>
+    <div class="btns">
+      <a class="btn p" href="mailto:qasimakram46@hotmail.com?subject=Portfolio%20performance%20case%20study">Email
+        me</a>
+      <a class="btn o" href="index.html#projects">More projects</a>
+      <a class="btn o" href="https://github.com/Muhammad-Qasim-Akram/Portfolio3D" target="_blank" rel="noopener">Source
+        on GitHub &#8599;</a>
+    </div>
+  </footer>
+
+  <script src="case-portfolio.js" defer></script>
+</body>
+
+</html>
