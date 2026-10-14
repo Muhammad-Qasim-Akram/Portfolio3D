@@ -263,8 +263,8 @@ const io = new IntersectionObserver(
 );
 document.querySelectorAll(".sr,.sr-l,.sr-r").forEach((el) => io.observe(el));
 
+if (window.emailjs) emailjs.init("yCgwIWXoWe_klsqNy");
 
-emailjs.init("yCgwIWXoWe_klsqNy");
 
 function handleSubmit() {
   var name = document.getElementById("from_name").value;
@@ -275,6 +275,13 @@ function handleSubmit() {
   var bar = document.getElementById("btnBar");
 
   if (!name || !email || !message) return;
+   if (!window.emailjs) {
+    window.location.href =
+      "mailto:qasimakram46@hotmail.com?subject=" + encodeURIComponent("Hiring Inquiry") +
+      "&body=" + encodeURIComponent(message + "\n\n" + name + " (" + email + ")");
+    return;
+  }
+
 
   btn.disabled = true;
   btnText.textContent = "Sending...";
