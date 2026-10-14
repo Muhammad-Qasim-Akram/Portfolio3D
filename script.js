@@ -158,14 +158,19 @@ const hero = document.getElementById("hero");
 const heroPhoto = document.querySelector(".hero-photo-wrap");
 const flipCard = document.getElementById("flipCard");
 const flipRotationElement = document.getElementById("flipRotation");
-const shrinkStartProgress = Math.max(
-  0,
-  Math.min(
-    1,
-    (heroCardMotion.shrinkStartAngle - heroCardMotion.flipStart) /
-      (heroCardMotion.flipEnd - heroCardMotion.flipStart),
-  ),
-);
+const compactHero = window.matchMedia("(max-width: 1000px)").matches;
+const flipDoneProgress = compactHero ? 0.6 : 1;
+const compactShrinkStart = 0.72;
+const shrinkStartProgress = compactHero
+  ? compactShrinkStart
+  : Math.max(
+      0,
+      Math.min(
+        1,
+        (heroCardMotion.shrinkStartAngle - heroCardMotion.flipStart) /
+          (heroCardMotion.flipEnd - heroCardMotion.flipStart),
+      ),
+    );
 let heroStartY = 0;
 let heroHeight = 0;
 let cardIsGone = null;

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a0a">
+<title>ChatRoom Case Study | Qasim Akram</title>
+<meta name="description" content="How ChatRoom works under the hood: JWT-authenticated WebSockets, Django Channels, Redis pub/sub fan-out and PostgreSQL. An interactive walkthrough by Qasim Akram.">
+<link rel="canonical" href="https://qasim-akram.netlify.app/case-chatroom.html">
+<meta property="og:type" content="article">
+<meta property="og:title" content="ChatRoom Case Study | Qasim Akram">
+<meta property="og:description" content="An interactive look at the architecture behind a real-time chat app: auth, fan-out and trade-offs.">
+<meta property="og:image" content="https://qasim-akram.netlify.app/img/og-image.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/svg+xml" href="img/favicon.svg">
+<link rel="stylesheet" href="case.css">
+</head>
+<body>
+<div class="c-ambient" aria-hidden="true"></div>
+<div class="cprog" id="cprog" aria-hidden="true"></div>
+
+<header class="cnav">
+  <a class="back" href="index.html#projects">&larr; Portfolio</a>
+  <span class="mid">Case study 01 <i>/</i> ChatRoom</span>
+  <a class="live" href="https://chat-room-two-pi.vercel.app/" target="_blank" rel="noopener">Live demo &#8599;</a>
+</header>
+
+<main>
+<section class="chero">
+  <div class="bgword" aria-hidden="true">REALTIME</div>
+  <div class="eyebrow sr">Case study 01</div>
+  <h1 class="sr" style="--d:.06s">Chat<em>Room</em></h1>
+  <p class="lead sr" style="--d:.12s">A real-time chat app where rooms, messages, reactions and notifications reach everyone instantly. This page walks through how one message travels through the system, and why each piece is built the way it is.</p>
+  <div class="chips sr" style="--d:.18s"><span>Django 4.2</span><span>Django Channels</span><span>Redis pub/sub</span><span>PostgreSQL</span><span>SimpleJWT</span><span>React</span><span>Vercel + Railway</span></div>
+  <div class="stats">
+    <div class="stat gc sr" style="--d:.1s"><b data-count="14">14</b><span>REST endpoints for rooms, messages, reactions and notifications</span></div>
+    <div class="stat gc sr" style="--d:.16s"><b>JWT</b><span>checked before a WebSocket is accepted</span></div>
+    <div class="stat gc sr" style="--d:.22s"><b>Redis</b><span>pub/sub fans events out across workers</span></div>
+    <div class="stat gc sr" style="--d:.28s"><b>2<sup>hosts</sup></b><span>React on Vercel, API, Postgres and Redis on Railway</span></div>
+  </div>
+</section>
+
+<section class="csec" id="problem">
+  <div class="eyebrow sr">The problem</div>
+  <h2 class="sr">What it had to do.</h2>
+  <p class="sub sr">Chat looks simple until two people are connected to different server processes. These four constraints shaped every decision below.</p>
+  <div class="cons">
+    <div class="con gc sr" style="--d:.04s"><span class="n">01</span><h3>Instant, not polled</h3><p>A message has to appear on every screen in the room without anyone refreshing or the client hammering the API.</p></div>
+    <div class="con gc sr" style="--d:.1s"><span class="n">02</span><h3>Authenticated sockets</h3><p>REST uses JWT. The WebSocket has to trust the same identity, and browsers can't attach headers to one.</p></div>
+    <div class="con gc sr" style="--d:.16s"><span class="n">03</span><h3>More than one worker</h3><p>Two users in the same room may be held by different processes. They still have to hear each other.</p></div>
+    <div class="con gc sr" style="--d:.22s"><span class="n">04</span><h3>One-person deployment</h3><p>Frontend on Vercel, backend, Postgres and Redis on Railway. Few moving parts, easy to redeploy.</p></div>
+  </div>
+</section>
+
+<section class="arch" id="arch" aria-label="Interactive architecture walkthrough">
+  <div class="pin" id="pin">
+    <div class="stage" id="stage">
+      <div class="stage-title">
+        <div><h2>Follow one message</h2><small>Scroll to move it. Drag to turn the scene. Tap any block.</small></div>
+        <span class="hint" id="hint">Drag to orbit</span>
+      </div>
+      <div class="scene"><div class="plane" id="plane"></div></div>
+      <div class="stage-ui">
+        <button class="pill" id="kill" aria-pressed="false"><i></i><span>Simulate Redis failure</span></button>
+        <button class="pill" id="reset">Reset view</button>
+      </div>
+      <div class="sheet" id="sheet" role="dialog" aria-live="polite" aria-label="Component details">
+        <button class="x" id="sheetX" aria-label="Close details">&times;</button>
+        <h3 id="shName"></h3><p class="role" id="shRole"></p>
+        <dl><div><dt>Decision</dt><dd id="shDec"></dd></div><div><dt>Trade-off</dt><dd id="shTrade"></dd></div></dl>
+      </div>
+    </div>
+    <aside class="narr gc" id="narr">
+      <div class="count" id="count">01 / 06</div>
+      <div class="steps" id="steps"></div>
+      <div class="dots" id="dots" role="tablist" aria-label="Steps"></div>
+      <p class="tip">Click a step number to jump to it.</p>
+    </aside>
+  </div>
+</section>
+<noscript><div class="ns"><p>This page is interactive. In short: the browser opens a WebSocket with a JWT, Channels middleware validates it, the consumer saves the message to PostgreSQL and publishes it to Redis, and Redis delivers it to every consumer in the room.</p></div></noscript>
+
+<section class="csec" id="decisions">
+  <div class="eyebrow sr">Decisions</div>
+  <h2 class="sr">Three choices, and what each one cost.</h2>
+  <p class="sub sr">Tap a card to see what I picked, what I turned down, and the price I accepted.</p>
+  <div class="dgrid" id="dgrid"></div>
+</section>
+
+<section class="csec" id="results">
+  <div class="eyebrow sr">Results</div>
+  <h2 class="sr">Measured, not claimed.</h2>
+  <p class="sub sr">Numbers come from a repeatable k6 load test, with the setup and date shown beside them.</p>
+  <div class="rgrid" id="rgrid"></div>
+  <div class="chart gc" id="chart" hidden>
+    <h3>Delivery latency as concurrent clients grow</h3>
+    <div class="bars" id="bars"></div>
+    <p class="readout" id="readout">Hover or tap a bar.</p>
+  </div>
+  <p class="setup" id="setup"></p>
+  <div class="pending" id="pending"><b>Load test pending.</b> The script is in <code>loadtest/k6-chatroom.js</code>. Fill the results object at the top of <code>case.js</code> after a run and this section fills itself in.</div>
+</section>
+
+<section class="csec" id="change">
+  <div class="eyebrow sr">Looking back</div>
+  <h2 class="sr">What I'd change next.</h2>
+  <div class="acc" id="acc"></div>
+</section>
+</main>
+
+<footer class="cfoot">
+  <h2>Want to talk about it?</h2>
+  <div class="btns">
+    <a class="btn p" href="mailto:qasimakram46@hotmail.com?subject=ChatRoom%20case%20study">Email me</a>
+    <a class="btn o" href="index.html#projects">More projects</a>
+    <a class="btn o" href="https://github.com/Muhammad-Qasim-Akram" target="_blank" rel="noopener">GitHub &#8599;</a>
+  </div>
+</footer>
+
+<script src="case.js" defer></script>
+</body>
+</html>
